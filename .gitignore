@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# 환경변수 (API 키 등 민감정보)
+.env
+.env.local
+.env.*.local
+
+# SQLite DB (데이터는 배포 후 sync API로 재적재)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# 로컬 전용 동기화 스크립트 출력
+backend/sync_once.py
+backend/sync_pharmacy.py
+
+# Node.js
+node_modules/
+.npm/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
