@@ -1,11 +1,13 @@
 """
-격자 기반 의료 공백 분석 엔진 (벡터화 최적화 버전).
+격자 기반 의료 공백 분석 엔진 (순수 numpy 버전).
 
 변경 이력:
   v2 — KDTree.query()를 격자마다 개별 호출하던 O(n×k) 방식을
        전체 격자 좌표를 numpy 배열로 한 번에 구성한 뒤
        KDTree.query(grid_array) 단일 호출로 교체 → 10~30배 성능 개선.
        인구 룩업 방식도 key 해시 대신 KDTree 최근접 매핑으로 교체.
+  v3 — scipy 의존성 제거. KDTree를 numpy 청크 브루트포스로 대체.
+       (Render 빌드 환경에 gfortran 없어 scipy 소스 빌드 실패 방지)
 """
 from __future__ import annotations
 
@@ -13,7 +15,6 @@ import math
 from typing import Any
 
 import numpy as np
-from scipy.spatial import KDTree
 
 # 위도·경도 → 미터 변환 (bbox 중심 위도로 동적 계산)
 _LAT_TO_M = 111_000
@@ -41,10 +42,39 @@ POP_WEIGHT_KEY: dict[str, str] = {
 # 최대 피처 수 제한 (브라우저 렌더링 보호)
 MAX_FEATURES = 8_000
 
+# 청크 크기 (메모리 절약을 위한 배치 처리)
+_CHUNK = 256
+
 
 def _lon_to_m(center_lat: float) -> float:
     """위도에 따른 경도 1도당 미터 수."""
     return _LAT_TO_M * math.cos(math.radians(center_lat))
+
+
+def _nn_query(
+    query_pts: np.ndarray,
+    ref_pts: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    numpy 브루트포스 최근접 이웃 탐색 (scipy.spatial.KDTree 대체).
+
+    청크 단위로 처리해 메모리 사용량 제한.
+    Returns (distances_1d, indices_1d).
+    """
+    n_q   = len(query_pts)
+    dists = np.empty(n_q, dtype=np.float64)
+    idxs  = np.empty(n_q, dtype=np.int64)
+
+    for s in range(0, n_q, _CHUNK):
+        e    = min(s + _CHUNK, n_q)
+        # (chunk, n_ref, 2)
+        diff = query_pts[s:e, np.newaxis, :] - ref_pts[np.newaxis, :, :]
+        d2   = (diff * diff).sum(axis=2)          # (chunk, n_ref)
+        best = d2.argmin(axis=1)                  # (chunk,)
+        dists[s:e] = np.sqrt(d2[np.arange(e - s), best])
+        idxs[s:e]  = best
+
+    return dists, idxs
 
 
 def _need_score_to_color(scores: np.ndarray) -> list[list[int]]:
@@ -72,7 +102,7 @@ def compute_gap(
     grid_m:     int   = 300,
 ) -> dict[str, Any]:
     """
-    전체 격자 → 벡터화 KDTree 쿼리 → GeoJSON FeatureCollection 반환.
+    전체 격자 → 벡터화 NN 쿼리 → GeoJSON FeatureCollection 반환.
 
     Args:
         facilities:   바운딩박스 내 의료시설 목록
@@ -101,7 +131,6 @@ def compute_gap(
 
     # 피처 수 제한 (줌아웃 안전장치)
     if len(lats) * len(lons) > MAX_FEATURES:
-        # 해상도 자동 조정
         n = math.ceil(math.sqrt(MAX_FEATURES))
         lats = np.linspace(min_lat + step_lat / 2, max_lat - step_lat / 2, n)
         lons = np.linspace(min_lon + step_lon / 2, max_lon - step_lon / 2, n)
@@ -119,21 +148,20 @@ def compute_gap(
         grid_lon * lon_to_m,
     ])
 
-    # ── 시설 KDTree (벡터 쿼리) ──────────────────────────────────
+    # ── 시설 NN (numpy 브루트포스) ───────────────────────────────
     if facilities:
         fac_m = np.array([
             [f["lat"] * _LAT_TO_M, f["lon"] * lon_to_m]
             for f in facilities
         ])
-        fac_tree = KDTree(fac_m)
-        fac_dists, _ = fac_tree.query(grid_m_arr)          # (n_cells,)
+        fac_dists, _ = _nn_query(grid_m_arr, fac_m)
     else:
         fac_dists = np.full(n_cells, 99_999.0)
 
     travel_times = fac_dists * NETWORK_FACTOR / CAR_SPEED_MPM   # 분
 
-    # ── 인구 KDTree (최근접 매핑) ────────────────────────────────
-    populations  = np.zeros(n_cells)
+    # ── 인구 NN (최근접 매핑) ────────────────────────────────────
+    populations    = np.zeros(n_cells)
     elderly_ratios = np.full(n_cells, 0.15)
     child_ratios   = np.full(n_cells, 0.11)
 
@@ -142,9 +170,7 @@ def compute_gap(
             [c["lat"] * _LAT_TO_M, c["lon"] * lon_to_m]
             for c in pop_cells
         ])
-        pop_tree = KDTree(pop_m)
-        # 가장 가까운 인구 격자가 500m 이내인 경우만 매핑
-        pop_dists, pop_idx = pop_tree.query(grid_m_arr)
+        pop_dists, pop_idx = _nn_query(grid_m_arr, pop_m)
         close_mask = pop_dists < 500
         for i in np.where(close_mask)[0]:
             c = pop_cells[pop_idx[i]]
@@ -161,16 +187,16 @@ def compute_gap(
         pop_factors = np.ones(n_cells)
 
     # ── 필요도 점수 계산 ─────────────────────────────────────────
-    time_scores  = np.minimum(100.0, (travel_times / threshold_min) * 50)
-    need_scores  = np.minimum(100.0, time_scores * pop_factors)
+    time_scores = np.minimum(100.0, (travel_times / threshold_min) * 50)
+    need_scores = np.minimum(100.0, time_scores * pop_factors)
 
     # ── GeoJSON 피처 조립 ────────────────────────────────────────
     colors   = _need_score_to_color(need_scores)
     features = []
 
     for i in range(n_cells):
-        lat  = float(grid_lat[i]) - step_lat / 2
-        lon  = float(grid_lon[i]) - step_lon / 2
+        lat = float(grid_lat[i]) - step_lat / 2
+        lon = float(grid_lon[i]) - step_lon / 2
         features.append({
             "type": "Feature",
             "geometry": {
