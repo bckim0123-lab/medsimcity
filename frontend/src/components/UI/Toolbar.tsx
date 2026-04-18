@@ -1,6 +1,7 @@
 'use client';
 
-import { MapPin, Activity, FlaskConical, Trash2, Loader2, Box } from 'lucide-react';
+import { MapPin, Activity, FlaskConical, Trash2, Loader2, Box, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { clsx } from 'clsx';
 import type { AnalysisMode } from '@/types';
@@ -27,6 +28,7 @@ const MODES: { id: AnalysisMode; label: string; icon: React.ReactNode; desc: str
 ];
 
 export default function Toolbar() {
+  const router = useRouter();
   const {
     analysisMode,
     setAnalysisMode,
@@ -43,6 +45,16 @@ export default function Toolbar() {
 
   return (
     <header className="flex items-center h-14 px-4 bg-slate-900/95 backdrop-blur border-b border-slate-700/50 z-30 gap-4">
+      {/* 홈 복귀 */}
+      <button
+        onClick={() => router.push('/')}
+        title="Command Center로 돌아가기"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-all border border-transparent hover:border-slate-700"
+      >
+        <ChevronLeft size={13} />
+        <span className="hidden sm:block">홈</span>
+      </button>
+
       {/* 로고 */}
       <div className="flex items-center gap-2 mr-2">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white font-bold text-xs">
