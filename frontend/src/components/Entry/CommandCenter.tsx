@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Activity, MapPin } from 'lucide-react';
 import ServiceCards from './ServiceCards';
@@ -9,11 +9,22 @@ import AgentChat from './AgentChat';
 export default function CommandCenter() {
   const router = useRouter();
   const [leaving, setLeaving] = useState(false);
+  const [agentTrigger, setAgentTrigger] = useState<{ query: string; ts: number } | null>(null);
+  const agentSectionRef = useRef<HTMLDivElement>(null);
 
   const goToDashboard = () => {
     setLeaving(true);
     setTimeout(() => router.push('/dashboard'), 380);
   };
+
+  const sendToAgent = useCallback((query: string) => {
+    // Scroll to agent chat first
+    agentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Small delay so scroll completes before the typing animation
+    setTimeout(() => {
+      setAgentTrigger({ query, ts: Date.now() });
+    }, 350);
+  }, []);
 
   return (
     <div
@@ -22,6 +33,7 @@ export default function CommandCenter() {
         opacity: leaving ? 0 : 1,
         transform: leaving ? 'scale(0.97)' : 'scale(1)',
         transition: 'opacity 0.38s ease-in, transform 0.38s ease-in',
+        pointerEvents: leaving ? 'none' : 'auto',
       }}
     >
       {/* Background grid */}
@@ -77,15 +89,20 @@ export default function CommandCenter() {
             </span>
           </h1>
           <p className="mt-3 text-sm text-slate-400 leading-relaxed">
-            {'\uC2E4\uC2DC\uAC04 \uC758\uB8CC \uC778\uD504\uB77C \uACF5\uBC31 \uBD84\uC11D \u00B7 \uC815\uCC45 \uD6A8\uACFC \uC2DC\uBBAC\uB808\uC774\uC158 \u00B7 \uC218\uAC00 \uCD5C\uC801 \uACBD\uB85C \uD0D0\uC0C9'}
+            {'\uC2E4\uC2DC\uAC04 \uC758\uB8CC \uC778\uD504\uB77C \uACF5\uBC31 \uBD84\uC11D \u00B7 \uC815\uCC45 \uD6A8\uACFC \uC2DC\uBBA4\uB808\uC774\uC158 \u00B7 \uC218\uAC00 \uCD5C\uC801 \uACBD\uB85C \uD0D0\uC0C9'}
           </p>
         </div>
 
         {/* Service cards */}
-        <ServiceCards onLaunchSimCity={goToDashboard} />
+        <ServiceCards
+          onLaunchSimCity={goToDashboard}
+          onSendToAgent={sendToAgent}
+        />
 
-        {/* AI Agent chat */}
-        <AgentChat />
+        {/* AI Agent chat — scroll target */}
+        <div ref={agentSectionRef} className="w-full flex justify-center">
+          <AgentChat triggerQuery={agentTrigger} />
+        </div>
       </main>
     </div>
   );

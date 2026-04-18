@@ -85,7 +85,12 @@ const EXAMPLES = [
 
 type ApiStatus = 'unknown' | 'live' | 'mock';
 
-export default function AgentChat() {
+interface AgentChatProps {
+  /** When this changes, AgentChat auto-sends the query (set by parent cards) */
+  triggerQuery?: { query: string; ts: number } | null;
+}
+
+export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
   const [messages, setMessages] = useState<Message[]>([INIT_MSG]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -208,6 +213,14 @@ export default function AgentChat() {
       setBusy(false);
     }
   }, [input, busy, messages]);
+
+  // Auto-send when a service card triggers a query
+  useEffect(() => {
+    if (triggerQuery?.query) {
+      send(triggerQuery.query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerQuery]);
 
   const statusColor = apiStatus === 'live' ? 'text-emerald-400' : apiStatus === 'mock' ? 'text-amber-400' : 'text-slate-500';
   const statusLabel = apiStatus === 'live' ? '\uC628\uB77C\uC778 (GPT-4o)' : apiStatus === 'mock' ? '\uB370\uBAA8 \uBAA8\uB4DC' : '\uC5F0\uB839 \uC911...';
