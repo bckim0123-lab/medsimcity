@@ -9,7 +9,9 @@ import type {
   ProposedFacility,
 } from '@/types';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+// 로컬 개발: NEXT_PUBLIC_API_URL=http://localhost:8000
+// Vercel 배포: NEXT_PUBLIC_API_URL 미설정 → /api-proxy (next.config.js 리라이트 경유)
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? '/api-proxy';
 
 async function get<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
   const url = new URL(BASE + path);
