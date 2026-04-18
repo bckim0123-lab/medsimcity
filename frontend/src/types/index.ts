@@ -4,7 +4,6 @@ export type FacilityType =
   | 'clinic'
   | 'pharmacy'
   | 'health_center'
-  | 'dental'
   | 'oriental';
 
 export interface Facility {
@@ -53,38 +52,9 @@ export interface GeoJSONFeature {
   properties: GapFeatureProperties;
 }
 
-// ── 제안 시설 ─────────────────────────────────────────────────────────────────
-export interface ProposedFacility {
-  id: string;
-  lat: number;
-  lon: number;
-  type: FacilityType;
-  name: string;
-}
-
-// ── 시나리오 결과 ─────────────────────────────────────────────────────────────
-export interface ScenarioResult {
-  score: number;
-  coverage_added: number;
-  total_population: number;
-  coverage_before: number;
-  coverage_after: number;
-  coverage_rate_before: number;
-  coverage_rate_after: number;
-  avg_time_before: number;
-  avg_time_after: number;
-  time_reduction_pct: number;
-  redundancy_warning: boolean;
-  redundancy_overlap_pct: number;
-  disease_weight: number;
-  access_score: number;
-  coverage_score: number;
-}
-
 // ── 분석 모드 ─────────────────────────────────────────────────────────────────
-export type AnalysisMode = 'profiling' | 'gap' | 'scenario';
+export type AnalysisMode = 'profiling' | 'gap';
 export type DiseaseType  = 'all' | 'emergency' | 'chronic' | 'pediatric';
-export type RegionType   = 'urban' | 'suburban' | 'rural';
 
 // ── 지도 경계 ─────────────────────────────────────────────────────────────────
 export interface MapBounds {

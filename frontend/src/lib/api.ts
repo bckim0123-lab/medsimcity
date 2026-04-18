@@ -2,11 +2,8 @@ import type {
   Facility,
   PopulationCell,
   GapGeoJSON,
-  ScenarioResult,
   MapBounds,
   DiseaseType,
-  RegionType,
-  ProposedFacility,
 } from '@/types';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://medsimcity.onrender.com';
@@ -15,16 +12,6 @@ async function get<T>(path: string, params: Record<string, string | number> = {}
   const url = new URL(BASE + path);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
   const res = await fetch(url.toString(), { cache: 'no-store' });
-  if (!res.ok) throw new Error(`API Error ${res.status}: ${path}`);
-  return res.json() as Promise<T>;
-}
-
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(BASE + path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
   if (!res.ok) throw new Error(`API Error ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
@@ -70,21 +57,6 @@ export function fetchGapAnalysis(
     max_lon: bounds.max_lon,
     disease_type,
     facility_type,
-  });
-}
-
-// ── 시나리오 분석 ─────────────────────────────────────────────────────────────
-export function fetchScenarioScore(
-  bounds: MapBounds,
-  proposed: ProposedFacility[],
-  disease_type: DiseaseType,
-  region_type: RegionType,
-): Promise<ScenarioResult> {
-  return post<ScenarioResult>('/api/analysis/scenario', {
-    bbox: bounds,
-    proposed_facilities: proposed,
-    disease_type,
-    region_type,
   });
 }
 

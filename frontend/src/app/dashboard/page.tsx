@@ -3,6 +3,7 @@ import Sidebar from '@/components/Sidebar/Sidebar';
 import KPIPanel from '@/components/Dashboard/KPIPanel';
 import Toolbar from '@/components/UI/Toolbar';
 import ErrorToast from '@/components/UI/ErrorToast';
+import AIAgentWidget from '@/components/Entry/AIAgentWidget';
 
 const MapCanvas = dynamic(() => import('@/components/Map/MapCanvas'), {
   ssr: false,
@@ -28,6 +29,7 @@ export default function DashboardPage() {
         <KPIPanel />
       </div>
       <ErrorToast />
+      <AIAgentWidget />
     </div>
   );
 }
