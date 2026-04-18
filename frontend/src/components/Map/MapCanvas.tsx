@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DeckGL from '@deck.gl/react';
 import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
@@ -80,6 +80,10 @@ export default function MapCanvas() {
 
   useMapData();
 
+  // Keep a stable ref to the latest viewState so resize effect can use it without stale closure
+  const viewStateRef = useRef(viewState);
+  viewStateRef.current = viewState;
+
   useEffect(() => {
     const el = document.getElementById('deckgl-wrapper');
     if (!el) return;
@@ -105,10 +109,10 @@ export default function MapCanvas() {
     [setViewState, updateBounds],
   );
 
+  // Re-fire bounds whenever container size changes (resize) or on mount
   useEffect(() => {
-    updateBounds(viewState as MapViewState);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    updateBounds(viewStateRef.current as MapViewState);
+  }, [updateBounds]);
 
   const handleHover = useCallback(
     (info: PickingInfo): boolean => {
@@ -290,10 +294,10 @@ function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }
       <>
         <p className="font-bold text-cyan-400 mb-1.5">{'\uC758\uB8CC \uACF5\uBC31 \uBD84\uC11D'}</p>
         <div className="space-y-0.5">
-          <p>{'\uC810\uC218:'} <span className={`font-mono font-bold ${scoreColor}`}>{p.need_score?.toFixed(1)}{'\uC810'}</span></p>
-          <p>{'\uC774\uB3D9 \uC2DC\uAC04:'} <span className="font-mono">{p.travel_time_min?.toFixed(1)}{'\uBD84'}</span></p>
-          <p>{'\uCD5C\uADFC \uC2DC\uC124:'} <span className="font-mono">{(p.nearest_dist_m / 1000)?.toFixed(2)}km</span></p>
-          {p.population > 0 && <p>{'\uC778\uAD6C \uC218:'} <span className="font-mono">{p.population.toLocaleString()}{'\uBA85'}</span></p>}
+          <p>{'\uC810\uC218:'} <span className={`font-mono font-bold ${scoreColor}`}>{(p.need_score ?? 0).toFixed(1)}{'\uC810'}</span></p>
+          <p>{'\uC774\uB3D9 \uC2DC\uAC04:'} <span className="font-mono">{(p.travel_time_min ?? 0).toFixed(1)}{'\uBD84'}</span></p>
+          <p>{'\uCD5C\uADFC \uC2DC\uC124:'} <span className="font-mono">{((p.nearest_dist_m ?? 0) / 1000).toFixed(2)}km</span></p>
+          {(p.population ?? 0) > 0 && <p>{'\uC778\uAD6C \uC218:'} <span className="font-mono">{(p.population ?? 0).toLocaleString()}{'\uBA85'}</span></p>}
         </div>
       </>
     );

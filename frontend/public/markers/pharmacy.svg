@@ -1,12 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Pill body left half -->
-  <path d="M 10 24 A 22 22 0 0 0 32 46 L 32 24 Z" fill="#f59e0b"/>
-  <!-- Pill body right half -->
-  <path d="M 32 24 L 32 46 A 22 22 0 0 0 54 24 Z" fill="#fbbf24"/>
-  <!-- Pill cap -->
-  <ellipse cx="32" cy="24" rx="22" ry="10" fill="#fcd34d"/>
-  <!-- Rx symbol -->
-  <text x="32" y="38" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#92400e" text-anchor="middle">Rx</text>
-  <!-- White dividing line -->
-  <rect x="30" y="24" width="4" height="22" fill="white" opacity="0.4"/>
+  <circle cx="32" cy="32" r="30" fill="#d97706"/>
+  <circle cx="32" cy="32" r="24" fill="#b45309"/>
+  <!-- Pill shape rotated 45deg: two halves -->
+  <rect x="16" y="26" width="32" height="12" rx="6" fill="white" transform="rotate(45 32 32)"/>
+  <rect x="16" y="26" width="16" height="12" rx="6" fill="#fcd34d" transform="rotate(45 32 32)"/>
 </svg>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Bot, FileText, ArrowRight, ChevronDown, MapPin } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { clsx } from 'clsx';
 import type { FacilityType, AnalysisMode } from '@/types';
@@ -56,7 +55,6 @@ function LocationCard({ onLaunch }: { onLaunch: () => void }) {
   const [selectedFacility, setSelectedFacility] = useState<FacilityType | 'all'>('all');
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>('profiling');
   const [selectedGu, setSelectedGu] = useState<string>('\uC804\uCCB4 \uC11C\uC6B8');
-  const router = useRouter();
   const { setFacilityTypeFilter, setAnalysisMode, setViewState, setSelectedRegionName, viewState } = useStore();
 
   const handleStart = () => {
@@ -65,8 +63,7 @@ function LocationCard({ onLaunch }: { onLaunch: () => void }) {
     setAnalysisMode(selectedMode);
     setViewState({ ...viewState, longitude: lon, latitude: lat, zoom: selectedGu === '\uC804\uCCB4 \uC11C\uC6B8' ? 11 : 13, pitch: 0, bearing: 0 });
     setSelectedRegionName(selectedGu === '\uC804\uCCB4 \uC11C\uC6B8' ? '\uC11C\uC6B8\uD2B9\uBCC4\uC2DC' : selectedGu);
-    onLaunch();
-    setTimeout(() => router.push('/dashboard'), 380);
+    onLaunch(); // CommandCenter handles fade animation + router.push
   };
 
   return (

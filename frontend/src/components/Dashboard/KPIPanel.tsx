@@ -31,7 +31,7 @@ export default function KPIPanel() {
     const scores = gapGeoJSON.features.map((f) => f.properties?.need_score ?? 0);
     const critical = scores.filter((s) => s >= 80).length;
     const high     = scores.filter((s) => s >= 60 && s < 80).length;
-    const avg      = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const avg      = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
     return { critical, high, avg: avg.toFixed(1), total: scores.length };
   })();
 
