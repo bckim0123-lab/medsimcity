@@ -14,9 +14,11 @@ import type {
 const BASE = process.env.NEXT_PUBLIC_API_URL || '/api-proxy';
 
 async function get<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
-  const url = new URL(BASE + path);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  const res = await fetch(url.toString(), { cache: 'no-store' });
+  const qs = new URLSearchParams(
+    Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+  ).toString();
+  const fullPath = BASE + path + (qs ? `?${qs}` : '');
+  const res = await fetch(fullPath, { cache: 'no-store' });
   if (!res.ok) throw new Error(`API Error ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
