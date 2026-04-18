@@ -114,7 +114,6 @@ export default function Sidebar() {
     facilityTypeFilter, setFacilityTypeFilter,
     facilities,
     setViewState,
-    viewState,
     setSelectedRegionName,
   } = useStore();
 
@@ -127,7 +126,9 @@ export default function Sidebar() {
     try {
       const result = await geocode(searchQuery);
       if (result) {
-        setViewState({ ...viewState, latitude: result.lat, longitude: result.lon, zoom: 13, pitch: 0, bearing: 0 });
+        // Use getState() to avoid stale closure on viewState
+        const current = useStore.getState().viewState;
+        setViewState({ ...current, latitude: result.lat, longitude: result.lon, zoom: 13, pitch: 0, bearing: 0 });
         setSelectedRegionName(result.name.split(',')[0]);
       }
     } catch (e) {
@@ -135,7 +136,7 @@ export default function Sidebar() {
     } finally {
       setIsSearching(false);
     }
-  }, [searchQuery, setViewState, viewState, setSelectedRegionName]);
+  }, [searchQuery, setViewState, setSelectedRegionName]);
 
   return (
     <aside className="flex flex-col h-full bg-slate-900 border-r border-slate-700/50 w-64 flex-shrink-0 overflow-y-auto">

@@ -7,13 +7,11 @@ import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import { MapViewState, PickingInfo, WebMercatorViewport } from '@deck.gl/core';
 import { Map } from 'react-map-gl/maplibre';
 import { useStore } from '@/store/useStore';
-import { useMapData } from '@/hooks/useMapData';
+import { useMapData, MIN_GAP_ZOOM } from '@/hooks/useMapData';
 import { useMarkerIcons } from '@/hooks/useMarkerIcons';
-import type { Facility, PopulationCell } from '@/types';
+import type { Facility, GapGeoJSON, PopulationCell } from '@/types';
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
-
-const MIN_GAP_ZOOM = 10;
 
 const ICON_SIZE_BY_TYPE: Record<string, number> = {
   hospital:      42,
@@ -182,7 +180,7 @@ export default function MapCanvas() {
       result.push(
         new GeoJsonLayer({
           id: 'gap-analysis',
-          data: gapGeoJSON as unknown as string,
+          data: gapGeoJSON as GapGeoJSON,
           filled: true,
           stroked: false,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -283,6 +281,20 @@ export default function MapCanvas() {
 function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }) {
   const obj     = info.object as Record<string, unknown>;
   const layerId = info.layer ?? '';
+
+  // HexagonLayer bin hover
+  if (layerId.includes('population-hex')) {
+    const count      = (obj?.count as number) ?? 0;
+    const elevation  = (obj?.elevationValue as number) ?? 0;
+    const population = elevation > 0 ? elevation : count;
+    return (
+      <>
+        <p className="font-bold text-sky-400 mb-1">{'\uC778\uAD6C \uBD84\uD3EC'}</p>
+        <p>{'\uADF8\uB9AC\uB4DC \uC778\uAD6C:'} <span className="font-mono text-sky-300">{Math.round(population).toLocaleString()}{'\uBA85'}</span></p>
+        {count > 0 && <p className="text-slate-400 text-xs">{'\uACA9\uC790 \uB0B4 \uC138\uC2DC\uC218: '}{count.toLocaleString()}</p>}
+      </>
+    );
+  }
 
   if (layerId.includes('gap') && obj?.properties) {
     const p = obj.properties as Record<string, number>;

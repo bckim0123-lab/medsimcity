@@ -1,7 +1,8 @@
 'use client';
 
-import { BarChart3, Activity } from 'lucide-react';
+import { BarChart3, Activity, Loader2, ZoomIn } from 'lucide-react';
 import { useStore } from '@/store/useStore';
+import { MIN_GAP_ZOOM } from '@/hooks/useMapData';
 
 const FACILITY_LEGEND = [
   { type: 'hospital',      label: '병원',  img: '/markers/hospital.svg' },
@@ -24,7 +25,14 @@ export default function KPIPanel() {
     gapGeoJSON,
     facilities,
     populationCells,
+    loadingFacilities,
+    loadingGap,
+    viewState,
+    showPopulation,
   } = useStore();
+
+  const currentZoom = viewState.zoom ?? 12;
+  const gapZoomOk   = currentZoom >= MIN_GAP_ZOOM;
 
   const gapStats = (() => {
     if (!gapGeoJSON?.features?.length) return null;
@@ -59,6 +67,7 @@ export default function KPIPanel() {
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Activity size={12} className="text-cyan-400" />
             현재 뷰 시설 현황
+            {loadingFacilities && <Loader2 size={11} className="text-cyan-400 animate-spin ml-auto" />}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {FACILITY_LEGEND.map(({ type, label, img }) => (
@@ -78,6 +87,25 @@ export default function KPIPanel() {
             <span className="text-cyan-400 font-bold font-mono">{facilities.length.toLocaleString()}개</span>
           </div>
         </div>
+
+        {/* 공백 분석 — 줌 안내 */}
+        {analysisMode === 'gap' && !gapZoomOk && (
+          <div className="flex items-start gap-2 bg-amber-950/40 border border-amber-800/40 rounded-xl px-3 py-2.5">
+            <ZoomIn size={13} className="text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-medium text-amber-300">줌을 높여야 분석됩니다</p>
+              <p className="text-[10px] text-amber-600 mt-0.5">현재 {currentZoom.toFixed(1)} / 최소 {MIN_GAP_ZOOM}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 공백 분석 로딩 */}
+        {loadingGap && gapZoomOk && (
+          <div className="flex items-center gap-2 text-slate-400 text-xs">
+            <Loader2 size={12} className="text-orange-400 animate-spin" />
+            공백 분석 중...
+          </div>
+        )}
 
         {/* 공백 분석 통계 */}
         {gapStats && (
@@ -107,7 +135,7 @@ export default function KPIPanel() {
         )}
 
         {/* 기본 안내 */}
-        {analysisMode === 'profiling' && !gapStats && (
+        {analysisMode === 'profiling' && !gapStats && !loadingFacilities && (
           <div className="text-center py-6 text-slate-500">
             <BarChart3 size={32} className="mx-auto mb-3 opacity-20" />
             <p className="text-sm">지도를 이동하면</p>
@@ -116,8 +144,8 @@ export default function KPIPanel() {
           </div>
         )}
 
-        {/* 인구 격자 정보 */}
-        {populationCells.length > 0 && (
+        {/* 인구 격자 정보 — showPopulation이 켜진 경우만 */}
+        {showPopulation && populationCells.length > 0 && (
           <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3">
             <p className="text-xs text-slate-500 mb-1">로드된 인구 격자</p>
             <p className="text-base font-bold text-sky-400 font-mono">{populationCells.length.toLocaleString()}개</p>

@@ -77,13 +77,15 @@ function LocationCard({ onLaunch }: { onLaunch: () => void }) {
   const [selectedFacility, setSelectedFacility] = useState<FacilityType | 'all'>('all');
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>('profiling');
   const [selectedGu, setSelectedGu] = useState<string>('\uC804\uCCB4 \uC11C\uC6B8');
-  const { setFacilityTypeFilter, setAnalysisMode, setViewState, setSelectedRegionName, viewState } = useStore();
+  const { setFacilityTypeFilter, setAnalysisMode, setViewState, setSelectedRegionName } = useStore();
 
   const handleStart = () => {
     const [lon, lat] = SEOUL_GU[selectedGu] ?? [126.978, 37.566];
+    // Read current viewState via getState() to avoid stale closure
+    const currentVS = useStore.getState().viewState;
     setFacilityTypeFilter(selectedFacility);
     setAnalysisMode(selectedMode);
-    setViewState({ ...viewState, longitude: lon, latitude: lat, zoom: selectedGu === '\uC804\uCCB4 \uC11C\uC6B8' ? 11 : 13, pitch: 0, bearing: 0 });
+    setViewState({ ...currentVS, longitude: lon, latitude: lat, zoom: selectedGu === '\uC804\uCCB4 \uC11C\uC6B8' ? 11 : 13, pitch: 0, bearing: 0 });
     setSelectedRegionName(selectedGu === '\uC804\uCCB4 \uC11C\uC6B8' ? '\uC11C\uC6B8\uD2B9\uBCC4\uC2DC' : selectedGu);
     onLaunch();
   };

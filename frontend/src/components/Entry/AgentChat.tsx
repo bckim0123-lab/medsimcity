@@ -134,13 +134,12 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
       });
 
       if (res.status === 503) {
-        // No API key — fall back to mock
+        // No API key — fall back to mock (return early to skip finally's setBusy duplicate)
         setApiStatus('mock');
         await new Promise((r) => setTimeout(r, 800 + Math.random() * 300));
         const reply = getMockReply(t);
         setMessages((prev) => [...prev, { role: 'agent', ...reply }]);
-        setBusy(false);
-        return;
+        return; // finally will call setBusy(false)
       }
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
