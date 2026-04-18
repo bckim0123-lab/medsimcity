@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, X, Send, Bot, ChevronDown } from 'lucide-react';
+import { X, Send, Bot, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface Message {
@@ -10,16 +10,16 @@ interface Message {
 }
 
 const MOCK_REPLIES: Record<string, string> = {
-  마포구: '마포구의 응급의료 취약지를 분석합니다. 현재 반경 2km 이내 응급실이 없는 격자가 전체의 12%로 나타났습니다. 정책 시뮬레이션 탭에서 상세 분석을 확인해보세요.',
-  서울: '서울시 전체 의료 공백 현황을 로드합니다. 자치구별 의원 수 편차가 최대 4.3배로 확인됩니다.',
-  치매: '치매 관련 의료기관 분포를 분석합니다. 치매안심센터 25개소와 전문 치료 기관의 접근성을 지도에 표시하겠습니다.',
-  고혈압: '고혈압 유병률이 높은 65세 이상 인구 밀집 지역을 필터링합니다. 만성질환 가중 분석 모드로 전환을 추천합니다.',
-  당뇨: '당뇨 전문 클리닉 접근성 분석을 시작합니다. 도보 20분 이내 당뇨 전문의 부재 지역이 서울 기준 23%입니다.',
+  '\uB9C8\uD3EC\uAD6C': '\uB9C8\uD3EC\uAD6C\uC758 \uC751\uAE09\uC758\uB8CC \uCDE8\uC57D\uC9C0\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4. \uD604\uC7AC \uBC18\uACBD 2km \uC774\uB0B4 \uC751\uAE09\uC2E4\uC774 \uC5C6\uB294 \uACA9\uC790\uAC00 \uC804\uCCB4\uC758 12%\uB85C \uB098\uD0C0\uB0AC\uC2B5\uB2C8\uB2E4.',
+  '\uC11C\uC6B8': '\uC11C\uC6B8\uC2DC \uC804\uCCB4 \uC758\uB8CC \uACF5\uBC31 \uD604\uD669\uC744 \uB85C\uB4DC\uD569\uB2C8\uB2E4. \uC790\uCE58\uAD6C\uBCC4 \uC758\uC6D0 \uC218 \uD3B8\uCC28\uAC00 \uCD5C\uB300 4.3\uBC30\uB85C \uD655\uC778\uB429\uB2C8\uB2E4.',
+  '\uCE58\uB9E4': '\uCE58\uB9E4 \uAD00\uB828 \uC758\uB8CC\uAE30\uAD00 \uBD84\uD3EC\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4. \uCE58\uB9E4\uC548\uC2EC\uC13C\uD130 25\uAC1C\uC18C\uC640 \uC804\uBB38 \uCE58\uB8CC \uAE30\uAD00\uC758 \uC811\uADFC\uC131\uC744 \uC9C0\uB3C4\uC5D0 \uD45C\uC2DC\uD558\uACA0\uC2B5\uB2C8\uB2E4.',
+  '\uACE0\uD601\uC555': '\uACE0\uD601\uC555 \uC720\uBCD1\uB960\uC774 \uB192\uC740 65\uC138 \uC774\uC0C1 \uC778\uAD6C \uBC00\uC9D1 \uC9C0\uC5ED\uC744 \uD544\uD130\uB9C1\uD569\uB2C8\uB2E4.',
+  '\uB2F9\uB1CC': '\uB2F9\uB1CC \uC804\uBB38 \uD074\uB9AC\uB2C9 \uC811\uADFC\uC131 \uBD84\uC11D\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4. \uB3C4\uBCF4 20\uBD84 \uC774\uB0B4 \uB2F9\uB1CC \uC804\uBB38\uC758 \uBD80\uC7AC \uC9C0\uC5ED\uC774 \uC11C\uC6B8 \uAE30\uC900 23%\uC785\uB2C8\uB2E4.',
 };
 
 const INITIAL_MESSAGE: Message = {
   role: 'agent',
-  text: '안녕하세요. MediSim Agent입니다.\n\n무엇을 분석해 드릴까요?\n예: "마포구 응급의료 취약지 분석"',
+  text: '\uC548\uB155\uD558\uC138\uC694. MediSim AI \uB3C4\uC6B0\uBBF8\uC785\uB2C8\uB2E4.\n\n\uBB34\uC5C7\uC744 \uBD84\uC11D\uD574 \uB4DC\uB9B4\uAE4C\uC694?\n\uC608: \"\uB9C8\uD3EC\uAD6C \uC751\uAE09\uC758\uB8CC \uCDE8\uC57D\uC9C0 \uBD84\uC11D\"',
 };
 
 export default function AIAgentWidget() {
@@ -40,14 +40,14 @@ export default function AIAgentWidget() {
       const key = Object.keys(MOCK_REPLIES).find((k) => text.includes(k));
       const reply = key
         ? MOCK_REPLIES[key]
-        : `"${text}"에 대한 분석 기능은 준비 중입니다. 마포구, 서울, 치매, 고혈압 등의 키워드를 사용해보세요.`;
+        : `"${text}"\uC5D0 \uB300\uD55C \uBD84\uC11D \uAE30\uB2A5\uC740 \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4. \uB9C8\uD3EC\uAD6C, \uC11C\uC6B8, \uCE58\uB9E4, \uACE0\uD601\uC555 \uB4F1\uC758 \uD0A4\uC6CC\uB4DC\uB97C \uC0AC\uC6A9\uD574\uBCF4\uC138\uC694.`;
       setMessages((prev) => [...prev, { role: 'agent', text: reply }]);
       setTyping(false);
     }, 900);
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
       {/* 대화창 */}
       <div className={clsx(
         'w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-right',
@@ -60,8 +60,8 @@ export default function AIAgentWidget() {
               <Bot size={14} className="text-white" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-100">MediSim Agent</p>
-              <p className="text-[10px] text-emerald-400">● 온라인</p>
+              <p className="text-xs font-semibold text-slate-100">AI \uB3C4\uC6B0\uBBF8</p>
+              <p className="text-[10px] text-emerald-400">\u25CF \uC628\uB77C\uC778</p>
             </div>
           </div>
           <button onClick={() => setOpen(false)} className="p-1 text-slate-500 hover:text-slate-300 transition-colors">
@@ -105,7 +105,7 @@ export default function AIAgentWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="메시지를 입력하세요..."
+              placeholder={'\uBA54\uC2DC\uC9C0\uB97C \uC785\uB825\uD558\uC138\uC694\u2026'}
               className="flex-1 bg-transparent text-xs text-slate-200 placeholder-slate-600 outline-none"
             />
             <button
@@ -119,19 +119,26 @@ export default function AIAgentWidget() {
         </div>
       </div>
 
-      {/* 토글 버튼 */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className={clsx(
-          'w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300',
-          'bg-gradient-to-br from-cyan-500 to-violet-600 text-white',
-          'hover:scale-110 hover:shadow-cyan-500/40',
-          open && 'rotate-180',
+      {/* 토글 버튼 + 라벨 */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className={clsx(
+            'w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300',
+            'bg-gradient-to-br from-cyan-500 to-violet-600 text-white',
+            'hover:scale-110 hover:shadow-cyan-500/40',
+            open && 'rotate-180',
+          )}
+          aria-label="AI \uB3C4\uC6B0\uBBF8 \uC5F4\uAE30"
+        >
+          {open ? <X size={20} /> : <Bot size={20} />}
+        </button>
+        {!open && (
+          <span className="text-[10px] font-medium text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded-full border border-slate-700/50 whitespace-nowrap">
+            AI \uB3C4\uC6B0\uBBF8
+          </span>
         )}
-        aria-label="AI 에이전트 열기"
-      >
-        {open ? <X size={20} /> : <MessageCircle size={20} />}
-      </button>
+      </div>
     </div>
   );
 }

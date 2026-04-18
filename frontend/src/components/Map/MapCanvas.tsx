@@ -131,9 +131,10 @@ export default function MapCanvas() {
       map.getStyle().layers
         .filter((l) => l.type === 'symbol')
         .forEach((l) => {
-          map.setPaintProperty(l.id, 'text-color', '#e2e8f0');
-          map.setPaintProperty(l.id, 'text-halo-color', 'rgba(2,8,23,0.95)');
-          map.setPaintProperty(l.id, 'text-halo-width', 2);
+          map.setPaintProperty(l.id, 'text-color', '#ffffff');
+          map.setPaintProperty(l.id, 'text-halo-color', 'rgba(0,0,0,0.98)');
+          map.setPaintProperty(l.id, 'text-halo-width', 3);
+          map.setPaintProperty(l.id, 'text-halo-blur', 0.5);
         });
     } catch {
       // ??? ?? ? ?? ? ??
@@ -175,8 +176,8 @@ export default function MapCanvas() {
       );
     }
 
-    // 2. ?? ?? GeoJSON
-    if (gapEnabled && (showGap || analysisMode === 'gap') && gapGeoJSON) {
+    // 2. ?? ?? GeoJSON ? ???? ????? ??? ?? ON ?? ?? ???
+    if (gapEnabled && showGap && gapGeoJSON) {
       result.push(
         new GeoJsonLayer({
           id: 'gap-analysis',
@@ -188,8 +189,7 @@ export default function MapCanvas() {
             (f.properties?.color ?? [150, 150, 150, 100]) as [number, number, number, number],
           opacity: 0.72,
           pickable: true,
-          autoHighlight: true,
-          highlightColor: [255, 255, 255, 60] as [number, number, number, number],
+          autoHighlight: false,
           onHover: handleHover,
         }),
       );
