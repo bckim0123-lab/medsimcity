@@ -110,7 +110,7 @@ export const useStore = create<MediSimState>((set) => ({
   setFacilityTypeFilter: (facilityTypeFilter) => set({ facilityTypeFilter }),
 
   // ── 레이어 ──────────────────────────────────────────────────
-  showPopulation:   true,
+  showPopulation:   false,
   togglePopulation: () => set((s) => ({ showPopulation: !s.showPopulation })),
 
   showGap:    false,

@@ -250,14 +250,14 @@ export default function MapCanvas() {
         </div>
       )}
 
-      {/* ?? ?? ???? */}
+      {/* facility legend */}
       <div className="absolute bottom-6 left-4 z-30 bg-slate-900/90 border border-slate-700/60 rounded-xl px-3 py-2.5 backdrop-blur-sm shadow-xl">
-        <p className="text-xs text-slate-500 font-medium mb-2">?? ??</p>
+        <p className="text-xs text-slate-500 font-medium mb-2">{'\uC2DC\uC124 \uBC94\uB840'}</p>
         {[
-          { type: 'hospital',      label: '??' },
-          { type: 'clinic',        label: '??' },
-          { type: 'pharmacy',      label: '??' },
-          { type: 'health_center', label: '???' },
+          { type: 'hospital',      label: '\uBCD1\uC6D0' },
+          { type: 'clinic',        label: '\uC758\uC6D0' },
+          { type: 'pharmacy',      label: '\uC57D\uAD6D' },
+          { type: 'health_center', label: '\uBCF4\uAC74\uC18C' },
         ].map(({ type, label }) => (
           <div key={type} className="flex items-center gap-2 py-0.5">
             <img src={`/markers/${type}.svg`} alt={label} className="w-5 h-5 object-contain" />
@@ -266,10 +266,10 @@ export default function MapCanvas() {
         ))}
       </div>
 
-      {/* ??? ?? */}
+      {/* zoom warning */}
       {!gapEnabled && analysisMode === 'gap' && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 px-4 py-2 bg-slate-800/90 border border-amber-500/50 text-amber-400 text-xs font-medium rounded-full backdrop-blur-sm pointer-events-none">
-          ??? ????? (?? zoom {currentZoom.toFixed(1)} / ?? {MIN_GAP_ZOOM})
+          {'\uC904\uC744 \uB192\uC5EC\uC57C \uBD84\uC11D\uB429\uB2C8\uB2E4'} ({'\uD604\uC7AC zoom'} {currentZoom.toFixed(1)} / {'\uCD5C\uC18C'} {MIN_GAP_ZOOM})
         </div>
       )}
     </div>
@@ -288,12 +288,12 @@ function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }
       : 'text-emerald-400';
     return (
       <>
-        <p className="font-bold text-cyan-400 mb-1.5">?? ?? ??</p>
+        <p className="font-bold text-cyan-400 mb-1.5">{'\uC758\uB8CC \uACF5\uBC31 \uBD84\uC11D'}</p>
         <div className="space-y-0.5">
-          <p>???: <span className={`font-mono font-bold ${scoreColor}`}>{p.need_score?.toFixed(1)}?</span></p>
-          <p>?? ??: <span className="font-mono">{p.travel_time_min?.toFixed(1)}?</span></p>
-          <p>??? ??: <span className="font-mono">{(p.nearest_dist_m / 1000)?.toFixed(2)}km</span></p>
-          {p.population > 0 && <p>?? ??: <span className="font-mono">{p.population.toLocaleString()}?</span></p>}
+          <p>{'\uC810\uC218:'} <span className={`font-mono font-bold ${scoreColor}`}>{p.need_score?.toFixed(1)}{'\uC810'}</span></p>
+          <p>{'\uC774\uB3D9 \uC2DC\uAC04:'} <span className="font-mono">{p.travel_time_min?.toFixed(1)}{'\uBD84'}</span></p>
+          <p>{'\uCD5C\uADFC \uC2DC\uC124:'} <span className="font-mono">{(p.nearest_dist_m / 1000)?.toFixed(2)}km</span></p>
+          {p.population > 0 && <p>{'\uC778\uAD6C \uC218:'} <span className="font-mono">{p.population.toLocaleString()}{'\uBA85'}</span></p>}
         </div>
       </>
     );
@@ -301,14 +301,14 @@ function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }
 
   if (layerId.includes('facilities') && obj?.name) {
     const typeLabel: Record<string, string> = {
-      hospital: '??', clinic: '??', pharmacy: '??',
-      health_center: '???', oriental: '???',
+      hospital: '\uBCD1\uC6D0', clinic: '\uC758\uC6D0', pharmacy: '\uC57D\uAD6D',
+      health_center: '\uBCF4\uAC74\uC18C', oriental: '\uD55C\uC758\uC6D0',
     };
     return (
       <>
         <p className="font-bold text-cyan-400 mb-1">{String(obj.name)}</p>
         <p className="text-slate-300">{typeLabel[String(obj.type)] ?? String(obj.category ?? obj.type)}</p>
-        {(obj.beds as number) ? <p>?? <span className="font-mono text-cyan-300">{String(obj.beds)}?</span></p> : null}
+        {(obj.beds as number) ? <p>{'\uBCD1\uC0C1'} <span className="font-mono text-cyan-300">{String(obj.beds)}{'\uAC1C'}</span></p> : null}
         {obj.phone && <p className="text-slate-400 text-xs">{String(obj.phone)}</p>}
         {obj.address && <p className="text-slate-500 text-xs mt-1 max-w-48 truncate">{String(obj.address)}</p>}
       </>

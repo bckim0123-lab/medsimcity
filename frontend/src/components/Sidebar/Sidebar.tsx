@@ -139,7 +139,6 @@ export default function Sidebar() {
 
   return (
     <aside className="flex flex-col h-full bg-slate-900 border-r border-slate-700/50 w-64 flex-shrink-0 overflow-y-auto">
-      {/* ?? */}
       <div className="px-4 py-4 border-b border-slate-700/50">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
@@ -147,22 +146,21 @@ export default function Sidebar() {
           </div>
           <div>
             <p className="font-bold text-slate-100 text-sm leading-none">MediSim</p>
-            <p className="text-slate-500 text-xs mt-0.5">?? ????</p>
+            <p className="text-slate-500 text-xs mt-0.5">{'\uC11C\uC6B8 \uC785\uC9C0\uBD84\uC11D'}</p>
           </div>
         </div>
       </div>
 
       <div className="flex-1 px-3 py-4 space-y-5">
-        {/* ?? ?? */}
         <div>
-          <SectionHeader icon={<Search size={13} />} title="?? ??" />
+          <SectionHeader icon={<Search size={13} />} title={'\uC9C0\uC5ED \uAC80\uC0C9'} />
           <div className="flex gap-1.5">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="?: ???, ???..."
+              placeholder={'\uC608: \uB9C8\uD3EC\uAD6C, \uAC15\uB0A8\uAD6C...'}
               className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
             />
             <button
@@ -175,26 +173,25 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* ??? ?? */}
         <div>
-          <SectionHeader icon={<Layers size={13} />} title="???" />
+          <SectionHeader icon={<Layers size={13} />} title={'\uB808\uC774\uC5B4'} />
           <div className="space-y-1">
             <LayerToggle
-              label="?? ??"
+              label={'\uC778\uAD6C \uBD84\uD3EC'}
               active={showPopulation}
               color="#38bdf8"
               onToggle={togglePopulation}
               icon={<Users size={12} />}
             />
             <LayerToggle
-              label="?? ?? ??"
+              label={'\uC758\uB8CC \uACF5\uBC31 \uBD84\uC11D'}
               active={showGap}
               color="#f97316"
               onToggle={toggleGap}
               icon={<Activity size={12} />}
             />
             <LayerToggle
-              label="?? ??"
+              label={'\uC2DC\uC124 \uD45C\uC2DC'}
               active={showFacilities}
               color="#10b981"
               onToggle={toggleFacilities}
@@ -203,16 +200,15 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* ?? ?? ?? */}
         <div>
-          <SectionHeader icon={<HeartPulse size={13} />} title="?? ??" />
+          <SectionHeader icon={<HeartPulse size={13} />} title={'\uC2DC\uC124 \uC720\uD615'} />
           <div className="space-y-0.5">
             {([
-              ['all',          '??',  undefined],
-              ['hospital',     '??',  FACILITY_ICONS['hospital']],
-              ['clinic',       '??',  FACILITY_ICONS['clinic']],
-              ['pharmacy',     '??',  FACILITY_ICONS['pharmacy']],
-              ['health_center','???',FACILITY_ICONS['health_center']],
+              ['all',           '\uC804\uCCB4',   undefined],
+              ['hospital',      '\uBCD1\uC6D0',   FACILITY_ICONS['hospital']],
+              ['clinic',        '\uC758\uC6D0',   FACILITY_ICONS['clinic']],
+              ['pharmacy',      '\uC57D\uAD6D',   FACILITY_ICONS['pharmacy']],
+              ['health_center', '\uBCF4\uAC74\uC18C', FACILITY_ICONS['health_center']],
             ] as [FacilityType | 'all', string, string | undefined][]).map(([v, l, img]) => (
               <RadioOption
                 key={v}
@@ -226,15 +222,14 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* ?? ???? */}
         <div>
-          <SectionHeader icon={<Pill size={13} />} title="?? ????" />
+          <SectionHeader icon={<Pill size={13} />} title={'\uC9C8\uD658 \uD544\uD130'} />
           <div className="space-y-0.5">
             {([
-              ['all',       '?? (?? ???)'],
-              ['emergency', '?? ?? (????)'],
-              ['chronic',   '???? (??? ??)'],
-              ['pediatric', '????? (?? ??)'],
+              ['all',       '\uC804\uCCB4 (\uAE30\uBCF8 \uBD84\uC11D)'],
+              ['emergency', '\uC751\uAE09 \uC758\uB8CC (\uC2EC\uC7A5\uB9C8\uBE44)'],
+              ['chronic',   '\uB9CC\uC131\uC9C8\uD658 (\uB2F9\uB1CC \uC678)'],
+              ['pediatric', '\uC18C\uC544\uACFC (\uC57C\uAC04 \uCD94\uAC00)'],
             ] as [DiseaseType, string][]).map(([v, l]) => (
               <RadioOption
                 key={v}
@@ -248,10 +243,9 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* ?? ?? */}
       <div className="px-4 py-3 border-t border-slate-700/50 text-xs text-slate-500">
-        <p>??? ??: <span className="text-slate-300 font-mono">{facilities.length.toLocaleString()}?</span></p>
-        <p className="mt-0.5 text-slate-600">??? ??: HIRA ?????????</p>
+        <p>{'\uB85C\uB4DC\uB41C \uC2DC\uC124: '}<span className="text-slate-300 font-mono">{facilities.length.toLocaleString()}{'\uAC1C'}</span></p>
+        <p className="mt-0.5 text-slate-600">{'\uB370\uC774\uD130 \uCD9C\uCC98: HIRA \uAC74\uAC15\uBCF4\uD5EC\uC2EC\uC0AC\uD3C9\uAC00\uC6D0'}</p>
       </div>
     </aside>
   );
