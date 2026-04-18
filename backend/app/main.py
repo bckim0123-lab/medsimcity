@@ -8,13 +8,16 @@ from .database import database, create_tables
 from .seed import seed_data
 from .routers import facilities, analysis, sync
 
-# ALLOWED_ORIGINS 환경변수로 CORS 도메인 관리
-# 미설정 시 전체 허용 (데모 환경)
-_raw = os.environ.get("ALLOWED_ORIGINS", "*")
-if _raw.strip() == "*":
-    ALLOWED_ORIGINS = ["*"]
-else:
-    ALLOWED_ORIGINS = [o.strip() for o in _raw.split(",") if o.strip()]
+# CORS 허용 오리진 목록
+# 환경변수로 추가 도메인을 쉼표 구분으로 지정 가능
+_BUILTIN = [
+    "https://medsimcity.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+_extra = os.environ.get("ALLOWED_ORIGINS", "")
+_extra_list = [o.strip() for o in _extra.split(",") if o.strip()]
+ALLOWED_ORIGINS = list(dict.fromkeys(_BUILTIN + _extra_list))
 
 
 @asynccontextmanager
@@ -37,7 +40,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=ALLOWED_ORIGINS != ["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

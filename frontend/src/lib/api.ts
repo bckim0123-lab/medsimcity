@@ -9,16 +9,12 @@ import type {
   ProposedFacility,
 } from '@/types';
 
-// 로컬 개발: NEXT_PUBLIC_API_URL=http://localhost:8000
-// Vercel 배포: NEXT_PUBLIC_API_URL 빈값/미설정 → /api-proxy (next.config.js 리라이트 경유)
-const BASE = process.env.NEXT_PUBLIC_API_URL || '/api-proxy';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://medsimcity.onrender.com';
 
 async function get<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
-  const qs = new URLSearchParams(
-    Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
-  ).toString();
-  const fullPath = BASE + path + (qs ? `?${qs}` : '');
-  const res = await fetch(fullPath, { cache: 'no-store' });
+  const url = new URL(BASE + path);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
+  const res = await fetch(url.toString(), { cache: 'no-store' });
   if (!res.ok) throw new Error(`API Error ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
