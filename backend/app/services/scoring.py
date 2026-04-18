@@ -12,9 +12,27 @@ import math
 from typing import Any
 
 import numpy as np
-from scipy.spatial import KDTree
 
 _LAT_TO_M      = 111_000
+_CHUNK         = 256   # 청크 브루트포스 NN용
+
+
+def _nn_query(
+    query_pts: np.ndarray,
+    ref_pts: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """numpy 브루트포스 최근접 이웃 (scipy.spatial.KDTree 대체)."""
+    n_q   = len(query_pts)
+    dists = np.empty(n_q, dtype=np.float64)
+    idxs  = np.empty(n_q, dtype=np.int64)
+    for s in range(0, n_q, _CHUNK):
+        e    = min(s + _CHUNK, n_q)
+        diff = query_pts[s:e, np.newaxis, :] - ref_pts[np.newaxis, :, :]
+        d2   = (diff * diff).sum(axis=2)
+        best = d2.argmin(axis=1)
+        dists[s:e] = np.sqrt(d2[np.arange(e - s), best])
+        idxs[s:e]  = best
+    return dists, idxs
 NETWORK_FACTOR = 1.35
 CAR_SPEED_MPM  = 500    # 30 km/h
 
@@ -70,14 +88,12 @@ def compute_score(
     pop_weights = pop_raw * (1.0 + ep_w)
 
     # ── Before: 기존 시설만 ───────────────────────────────────────
-    before_tree  = KDTree(_to_m(existing, lat_scale, lon_scale))
-    before_dists, _ = before_tree.query(pop_m)
+    before_dists, _ = _nn_query(pop_m, _to_m(existing, lat_scale, lon_scale))
     before_times = before_dists * NETWORK_FACTOR / CAR_SPEED_MPM
 
     # ── After: 기존 + 제안 시설 ──────────────────────────────────
     all_recs    = existing + proposed
-    after_tree  = KDTree(_to_m(all_recs, lat_scale, lon_scale))
-    after_dists, _ = after_tree.query(pop_m)
+    after_dists, _ = _nn_query(pop_m, _to_m(all_recs, lat_scale, lon_scale))
     after_times = after_dists * NETWORK_FACTOR / CAR_SPEED_MPM
 
     total_wp = float(np.sum(pop_weights))
@@ -100,8 +116,7 @@ def compute_score(
     if proposed and existing:
         ex_arr = _to_m(existing, lat_scale, lon_scale)
         pr_arr = _to_m(proposed, lat_scale, lon_scale)
-        ex_tree = KDTree(ex_arr)
-        pr_dists, _ = ex_tree.query(pr_arr)
+        pr_dists, _ = _nn_query(pr_arr, ex_arr)
         redundancy_warning = bool(np.any(pr_dists < 800))
         overlap_pct = float(np.mean(pr_dists < 1_500) * 100)
 
