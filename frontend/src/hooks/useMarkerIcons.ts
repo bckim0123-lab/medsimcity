@@ -6,49 +6,30 @@ export type MarkerIconMap = Partial<Record<string, string>>;
 
 const MARKER_TYPES = ['hospital', 'clinic', 'pharmacy', 'health_center'] as const;
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+// SVG → Canvas PNG data URL 변환 (Deck.gl WebGL 텍스처 호환)
+function rasterizeSvg(url: string, size = 256): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('no ctx')); return; }
+      ctx.drawImage(img, 0, 0, size, size);
+      resolve(canvas.toDataURL('image/png'));
+    };
     img.onerror = reject;
-    img.src = src;
+    // SVG 로드 시 timestamp로 캐시 무효화 방지
+    img.src = url;
   });
 }
 
-async function removeWhiteBg(url: string): Promise<string> {
-  const img = await loadImage(url);
-  const canvas = document.createElement('canvas');
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0);
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-
-  // 흰색/밝은 배경(R>230 && G>230 && B>230) 픽셀의 알파값을 투명으로
-  // 엣지 픽셀은 부드럽게 처리
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    const brightness = (r + g + b) / 3;
-
-    if (r > 230 && g > 230 && b > 230) {
-      // 완전히 흰색에 가까울수록 더 투명
-      const alpha = Math.max(0, 255 - brightness);
-      data[i + 3] = Math.round(alpha * 0.3); // 완전 투명에 가깝게
-    }
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-  return canvas.toDataURL('image/png');
-}
-
 /**
- * 마커 이미지 4종을 로드하여 흰 배경을 제거한 data URL 맵을 반환.
- * SSR 환경에서는 빈 객체를 반환하고 클라이언트에서만 처리됨.
+ * SVG 마커 4종을 PNG data URL로 래스터라이즈하여 반환.
+ * - SVG는 투명 배경이므로 별도 배경 제거 불필요
+ * - Deck.gl IconLayer의 iconAtlas는 WebGL 텍스처 기반으로 PNG data URL이 가장 안정적
  */
 export function useMarkerIcons(): MarkerIconMap {
   const [icons, setIcons] = useState<MarkerIconMap>({});
@@ -60,11 +41,11 @@ export function useMarkerIcons(): MarkerIconMap {
       const entries = await Promise.all(
         MARKER_TYPES.map(async (type) => {
           try {
-            const dataUrl = await removeWhiteBg(`/markers/${type}.png`);
+            const dataUrl = await rasterizeSvg(`/markers/${type}.svg`, 256);
             return [type, dataUrl] as [string, string];
           } catch {
-            // 실패 시 원본 URL 사용
-            return [type, `/markers/${type}.png`] as [string, string];
+            // 래스터라이즈 실패 시 SVG URL 직접 사용
+            return [type, `/markers/${type}.svg`] as [string, string];
           }
         }),
       );

@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4dd0e1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00838f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M40 80 L40 160 L160 160 L160 80 L140 80 L140 60 L60 60 L60 80 Z" fill="url(#g)" stroke="#006064" stroke-width="3"/>
+  <rect x="70" y="90" width="20" height="20" fill="white" stroke="#006064" stroke-width="1.5"/>
+  <rect x="110" y="90" width="20" height="20" fill="white" stroke="#006064" stroke-width="1.5"/>
+  <rect x="70" y="120" width="20" height="20" fill="white" stroke="#006064" stroke-width="1.5"/>
+  <rect x="110" y="120" width="20" height="20" fill="white" stroke="#006064" stroke-width="1.5"/>
+  <rect x="90" y="140" width="20" height="20" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+  <line x1="100" y1="65" x2="100" y2="75" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <line x1="95" y1="70" x2="105" y2="70" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <text x="100" y="185" font-family="sans-serif" font-size="20" font-weight="bold" fill="#e2e8f0" text-anchor="middle">ба</text>
+</svg>

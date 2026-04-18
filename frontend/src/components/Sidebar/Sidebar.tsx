@@ -17,10 +17,10 @@ import type { DiseaseType, FacilityType } from '@/types';
 import { clsx } from 'clsx';
 
 const FACILITY_ICONS: Partial<Record<string, string>> = {
-  hospital:      '/markers/hospital.png',
-  clinic:        '/markers/clinic.png',
-  pharmacy:      '/markers/pharmacy.png',
-  health_center: '/markers/health_center.png',
+  hospital:      '/markers/hospital.svg',
+  clinic:        '/markers/clinic.svg',
+  pharmacy:      '/markers/pharmacy.svg',
+  health_center: '/markers/health_center.svg',
 };
 
 function LayerToggle({
@@ -139,7 +139,7 @@ export default function Sidebar() {
 
   return (
     <aside className="flex flex-col h-full bg-slate-900 border-r border-slate-700/50 w-64 flex-shrink-0 overflow-y-auto">
-      {/* 로고 */}
+      {/* ?? */}
       <div className="px-4 py-4 border-b border-slate-700/50">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
@@ -147,22 +147,22 @@ export default function Sidebar() {
           </div>
           <div>
             <p className="font-bold text-slate-100 text-sm leading-none">MediSim</p>
-            <p className="text-slate-500 text-xs mt-0.5">서울 입지분석</p>
+            <p className="text-slate-500 text-xs mt-0.5">?? ????</p>
           </div>
         </div>
       </div>
 
       <div className="flex-1 px-3 py-4 space-y-5">
-        {/* 지역 검색 */}
+        {/* ?? ?? */}
         <div>
-          <SectionHeader icon={<Search size={13} />} title="지역 검색" />
+          <SectionHeader icon={<Search size={13} />} title="?? ??" />
           <div className="flex gap-1.5">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="예: 강남구, 노원구..."
+              placeholder="?: ???, ???..."
               className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
             />
             <button
@@ -175,26 +175,26 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* 레이어 제어 */}
+        {/* ??? ?? */}
         <div>
-          <SectionHeader icon={<Layers size={13} />} title="레이어" />
+          <SectionHeader icon={<Layers size={13} />} title="???" />
           <div className="space-y-1">
             <LayerToggle
-              label="인구 밀도"
+              label="?? ??"
               active={showPopulation}
               color="#38bdf8"
               onToggle={togglePopulation}
               icon={<Users size={12} />}
             />
             <LayerToggle
-              label="의료 공백 분석"
+              label="?? ?? ??"
               active={showGap}
               color="#f97316"
               onToggle={toggleGap}
               icon={<Activity size={12} />}
             />
             <LayerToggle
-              label="의료 시설"
+              label="?? ??"
               active={showFacilities}
               color="#10b981"
               onToggle={toggleFacilities}
@@ -203,16 +203,16 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* 시설 유형 필터 */}
+        {/* ?? ?? ?? */}
         <div>
-          <SectionHeader icon={<HeartPulse size={13} />} title="시설 유형" />
+          <SectionHeader icon={<HeartPulse size={13} />} title="?? ??" />
           <div className="space-y-0.5">
             {([
-              ['all',          '전체', undefined],
-              ['hospital',     '병원',   FACILITY_ICONS['hospital']],
-              ['clinic',       '의원',   FACILITY_ICONS['clinic']],
-              ['pharmacy',     '약국',   FACILITY_ICONS['pharmacy']],
-              ['health_center','보건소', FACILITY_ICONS['health_center']],
+              ['all',          '??',  undefined],
+              ['hospital',     '??',  FACILITY_ICONS['hospital']],
+              ['clinic',       '??',  FACILITY_ICONS['clinic']],
+              ['pharmacy',     '??',  FACILITY_ICONS['pharmacy']],
+              ['health_center','???',FACILITY_ICONS['health_center']],
             ] as [FacilityType | 'all', string, string | undefined][]).map(([v, l, img]) => (
               <RadioOption
                 key={v}
@@ -226,15 +226,15 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* 질환 우선순위 */}
+        {/* ?? ???? */}
         <div>
-          <SectionHeader icon={<Pill size={13} />} title="질환 우선순위" />
+          <SectionHeader icon={<Pill size={13} />} title="?? ????" />
           <div className="space-y-0.5">
             {([
-              ['all',       '전체 (균등 가중치)'],
-              ['emergency', '중증 응급 (골든타임)'],
-              ['chronic',   '만성질환 (고령자 가중)'],
-              ['pediatric', '소아청소년 (아동 가중)'],
+              ['all',       '?? (?? ???)'],
+              ['emergency', '?? ?? (????)'],
+              ['chronic',   '???? (??? ??)'],
+              ['pediatric', '????? (?? ??)'],
             ] as [DiseaseType, string][]).map(([v, l]) => (
               <RadioOption
                 key={v}
@@ -248,10 +248,10 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* 하단 통계 */}
+      {/* ?? ?? */}
       <div className="px-4 py-3 border-t border-slate-700/50 text-xs text-slate-500">
-        <p>로드된 시설: <span className="text-slate-300 font-mono">{facilities.length.toLocaleString()}개</span></p>
-        <p className="mt-0.5 text-slate-600">데이터 출처: HIRA 건강보험심사평가원</p>
+        <p>??? ??: <span className="text-slate-300 font-mono">{facilities.length.toLocaleString()}?</span></p>
+        <p className="mt-0.5 text-slate-600">??? ??: HIRA ?????????</p>
       </div>
     </aside>
   );

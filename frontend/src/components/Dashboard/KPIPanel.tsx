@@ -1,16 +1,13 @@
 'use client';
 
-import {
-  BarChart3,
-  Activity,
-} from 'lucide-react';
+import { BarChart3, Activity } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 
 const FACILITY_LEGEND = [
-  { type: 'hospital',      label: '병원',  img: '/markers/hospital.png' },
-  { type: 'clinic',        label: '의원',  img: '/markers/clinic.png' },
-  { type: 'pharmacy',      label: '약국',  img: '/markers/pharmacy.png' },
-  { type: 'health_center', label: '보건소', img: '/markers/health_center.png' },
+  { type: 'hospital',      label: '병원',  img: '/markers/hospital.svg' },
+  { type: 'clinic',        label: '의원',  img: '/markers/clinic.svg' },
+  { type: 'pharmacy',      label: '약국',  img: '/markers/pharmacy.svg' },
+  { type: 'health_center', label: '보건소', img: '/markers/health_center.svg' },
 ];
 
 const GAP_LEGEND = [
@@ -29,7 +26,6 @@ export default function KPIPanel() {
     populationCells,
   } = useStore();
 
-  // 갭 분석 통계
   const gapStats = (() => {
     if (!gapGeoJSON?.features?.length) return null;
     const scores = gapGeoJSON.features.map((f) => f.properties?.need_score ?? 0);
@@ -39,7 +35,6 @@ export default function KPIPanel() {
     return { critical, high, avg: avg.toFixed(1), total: scores.length };
   })();
 
-  // 시설 유형별 집계
   const facilityStats = (() => {
     if (!facilities.length) return null;
     const counts: Record<string, number> = {};
@@ -59,8 +54,7 @@ export default function KPIPanel() {
       </div>
 
       <div className="flex-1 px-3 py-4 space-y-4">
-
-        {/* ── 시설 현황 카드 ─────────────────────────────────── */}
+        {/* 시설 현황 카드 */}
         <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Activity size={12} className="text-cyan-400" />
@@ -85,14 +79,13 @@ export default function KPIPanel() {
           </div>
         </div>
 
-        {/* ── 공백 분석 패널 ──────────────────────────────────── */}
+        {/* 공백 분석 통계 */}
         {gapStats && (
           <div className="space-y-3">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <BarChart3 size={12} className="text-orange-400" />
               의료 공백 분포
             </p>
-
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold text-red-400">{gapStats.critical}</p>
@@ -105,7 +98,6 @@ export default function KPIPanel() {
                 <p className="text-xs text-slate-600">(점수 60~80)</p>
               </div>
             </div>
-
             <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-400 mb-1">전체 평균 필요도</p>
               <p className="text-2xl font-bold text-amber-400">{gapStats.avg}</p>
@@ -114,15 +106,13 @@ export default function KPIPanel() {
           </div>
         )}
 
-        {/* ── 프로파일링 기본 상태 ────────────────────────────── */}
+        {/* 기본 안내 */}
         {analysisMode === 'profiling' && !gapStats && (
           <div className="text-center py-6 text-slate-500">
             <BarChart3 size={32} className="mx-auto mb-3 opacity-20" />
             <p className="text-sm">지도를 이동하면</p>
             <p className="text-sm">자동으로 데이터를 로드합니다</p>
-            <p className="text-xs mt-2 text-slate-600">
-              상단 탭에서 분석 모드를 선택하세요
-            </p>
+            <p className="text-xs mt-2 text-slate-600">상단 탭에서 분석 모드를 선택하세요</p>
           </div>
         )}
 
@@ -135,9 +125,8 @@ export default function KPIPanel() {
         )}
       </div>
 
-      {/* 하단 범례 */}
+      {/* 범례 */}
       <div className="px-4 py-4 border-t border-slate-700/50 space-y-4">
-        {/* 시설 범례 */}
         <div>
           <p className="text-xs text-slate-500 font-medium mb-2">시설 범례</p>
           <div className="grid grid-cols-2 gap-1.5">
@@ -149,8 +138,6 @@ export default function KPIPanel() {
             ))}
           </div>
         </div>
-
-        {/* 공백 색상 범례 */}
         <div>
           <p className="text-xs text-slate-500 font-medium mb-2">공백 필요도</p>
           <div className="flex items-center gap-1">

@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import DeckGL from '@deck.gl/react';
-import { GeoJsonLayer } from '@deck.gl/layers';
-import { IconLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, IconLayer } from '@deck.gl/layers';
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import { MapViewState, PickingInfo, WebMercatorViewport } from '@deck.gl/core';
 import { Map } from 'react-map-gl/maplibre';
@@ -24,9 +23,8 @@ const ICON_SIZE_BY_TYPE: Record<string, number> = {
   oriental:      26,
 };
 
-// 시설 타입별 아이콘 매핑 — iconAtlas는 단일 PNG, mapping은 전체 이미지를 1개 아이콘으로 취급
 const ICON_MAPPING = {
-  icon: { x: 0, y: 0, width: 512, height: 512, anchorY: 512 },
+  icon: { x: 0, y: 0, width: 256, height: 256, anchorY: 256 },
 };
 
 function viewportToBounds(vs: MapViewState, width: number, height: number) {
@@ -124,7 +122,7 @@ export default function MapCanvas() {
     [setTooltip],
   );
 
-  // 한글 지명 강화
+  // ?? ?? ??
   const handleMapLoad = useCallback((evt: { target: { getStyle: () => { layers: Array<{ id: string; type: string }> }; setPaintProperty: (id: string, prop: string, val: unknown) => void } }) => {
     const map = evt.target;
     try {
@@ -136,19 +134,18 @@ export default function MapCanvas() {
           map.setPaintProperty(l.id, 'text-halo-width', 2);
         });
     } catch {
-      // 스타일이 아직 로드되지 않은 경우 무시
+      // ??? ?? ? ?? ? ??
     }
   }, []);
 
   const currentZoom = (viewState as MapViewState).zoom ?? 12;
   const gapEnabled  = currentZoom >= MIN_GAP_ZOOM;
-
-  const iconsReady = Object.keys(markerIcons).length === FACILITY_TYPES.length;
+  const iconsReady  = Object.keys(markerIcons).length === FACILITY_TYPES.length;
 
   const layers = useMemo(() => {
     const result = [];
 
-    // 1. 인구 밀도 헥사곤 (반경 600m)
+    // 1. ?? ?? ??? (?? 600m)
     if (showPopulation && populationCells.length > 0) {
       result.push(
         new HexagonLayer<PopulationCell>({
@@ -176,7 +173,7 @@ export default function MapCanvas() {
       );
     }
 
-    // 2. 의료 공백 GeoJSON
+    // 2. ?? ?? GeoJSON
     if (gapEnabled && (showGap || analysisMode === 'gap') && gapGeoJSON) {
       result.push(
         new GeoJsonLayer({
@@ -196,7 +193,7 @@ export default function MapCanvas() {
       );
     }
 
-    // 3. 의료 시설 IconLayer (타입별, 배경 제거 이미지)
+    // 3. ?? ?? IconLayer (SVG ?????? ???)
     if (showFacilities && facilities.length > 0 && iconsReady) {
       FACILITY_TYPES.forEach((type) => {
         const dataUrl = markerIcons[type];
@@ -243,7 +240,7 @@ export default function MapCanvas() {
         <Map mapStyle={MAP_STYLE} onLoad={handleMapLoad as never} />
       </DeckGL>
 
-      {/* 툴팁 */}
+      {/* ?? */}
       {tooltip?.object && (
         <div
           className="map-tooltip absolute z-50 max-w-xs"
@@ -253,26 +250,26 @@ export default function MapCanvas() {
         </div>
       )}
 
-      {/* 지도 범례 오버레이 */}
+      {/* ?? ?? ???? */}
       <div className="absolute bottom-6 left-4 z-30 bg-slate-900/90 border border-slate-700/60 rounded-xl px-3 py-2.5 backdrop-blur-sm shadow-xl">
-        <p className="text-xs text-slate-500 font-medium mb-2">시설 범례</p>
+        <p className="text-xs text-slate-500 font-medium mb-2">?? ??</p>
         {[
-          { type: 'hospital',      label: '병원' },
-          { type: 'clinic',        label: '의원' },
-          { type: 'pharmacy',      label: '약국' },
-          { type: 'health_center', label: '보건소' },
+          { type: 'hospital',      label: '??' },
+          { type: 'clinic',        label: '??' },
+          { type: 'pharmacy',      label: '??' },
+          { type: 'health_center', label: '???' },
         ].map(({ type, label }) => (
           <div key={type} className="flex items-center gap-2 py-0.5">
-            <img src={`/markers/${type}.png`} alt={label} className="w-5 h-5 object-contain" />
+            <img src={`/markers/${type}.svg`} alt={label} className="w-5 h-5 object-contain" />
             <span className="text-xs text-slate-300">{label}</span>
           </div>
         ))}
       </div>
 
-      {/* 줌아웃 경고 */}
+      {/* ??? ?? */}
       {!gapEnabled && analysisMode === 'gap' && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 px-4 py-2 bg-slate-800/90 border border-amber-500/50 text-amber-400 text-xs font-medium rounded-full backdrop-blur-sm pointer-events-none">
-          줌인이 필요합니다 (현재 zoom {currentZoom.toFixed(1)} / 최소 {MIN_GAP_ZOOM})
+          ??? ????? (?? zoom {currentZoom.toFixed(1)} / ?? {MIN_GAP_ZOOM})
         </div>
       )}
     </div>
@@ -291,12 +288,12 @@ function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }
       : 'text-emerald-400';
     return (
       <>
-        <p className="font-bold text-cyan-400 mb-1.5">의료 공백 지표</p>
+        <p className="font-bold text-cyan-400 mb-1.5">?? ?? ??</p>
         <div className="space-y-0.5">
-          <p>필요도: <span className={`font-mono font-bold ${scoreColor}`}>{p.need_score?.toFixed(1)}점</span></p>
-          <p>이동 시간: <span className="font-mono">{p.travel_time_min?.toFixed(1)}분</span></p>
-          <p>최근접 거리: <span className="font-mono">{(p.nearest_dist_m / 1000)?.toFixed(2)}km</span></p>
-          {p.population > 0 && <p>거주 인구: <span className="font-mono">{p.population.toLocaleString()}명</span></p>}
+          <p>???: <span className={`font-mono font-bold ${scoreColor}`}>{p.need_score?.toFixed(1)}?</span></p>
+          <p>?? ??: <span className="font-mono">{p.travel_time_min?.toFixed(1)}?</span></p>
+          <p>??? ??: <span className="font-mono">{(p.nearest_dist_m / 1000)?.toFixed(2)}km</span></p>
+          {p.population > 0 && <p>?? ??: <span className="font-mono">{p.population.toLocaleString()}?</span></p>}
         </div>
       </>
     );
@@ -304,14 +301,14 @@ function TooltipContent({ info }: { info: { object?: unknown; layer?: string } }
 
   if (layerId.includes('facilities') && obj?.name) {
     const typeLabel: Record<string, string> = {
-      hospital: '병원', clinic: '의원', pharmacy: '약국',
-      health_center: '보건소', oriental: '한의원',
+      hospital: '??', clinic: '??', pharmacy: '??',
+      health_center: '???', oriental: '???',
     };
     return (
       <>
         <p className="font-bold text-cyan-400 mb-1">{String(obj.name)}</p>
         <p className="text-slate-300">{typeLabel[String(obj.type)] ?? String(obj.category ?? obj.type)}</p>
-        {(obj.beds as number) ? <p>병상 <span className="font-mono text-cyan-300">{String(obj.beds)}개</span></p> : null}
+        {(obj.beds as number) ? <p>?? <span className="font-mono text-cyan-300">{String(obj.beds)}?</span></p> : null}
         {obj.phone && <p className="text-slate-400 text-xs">{String(obj.phone)}</p>}
         {obj.address && <p className="text-slate-500 text-xs mt-1 max-w-48 truncate">{String(obj.address)}</p>}
       </>

@@ -7,42 +7,41 @@ import { useStore } from '@/store/useStore';
 import { clsx } from 'clsx';
 import type { FacilityType, AnalysisMode } from '@/types';
 
-// 서울 25개 자치구 중심 좌표 (Nominatim 호출 없이 즉시 이동)
 const SEOUL_GU: Record<string, [number, number]> = {
-  '전체 서울':  [126.978, 37.566],
-  '강남구':     [127.047, 37.517],
-  '강동구':     [127.124, 37.530],
-  '강북구':     [127.011, 37.640],
-  '강서구':     [126.849, 37.551],
-  '관악구':     [126.951, 37.478],
-  '광진구':     [127.082, 37.538],
-  '구로구':     [126.888, 37.495],
-  '금천구':     [126.896, 37.457],
-  '노원구':     [127.057, 37.655],
-  '도봉구':     [127.047, 37.669],
-  '동대문구':   [127.040, 37.574],
-  '동작구':     [126.940, 37.512],
-  '마포구':     [126.909, 37.566],
-  '서대문구':   [126.938, 37.579],
-  '서초구':     [127.032, 37.483],
-  '성동구':     [127.041, 37.563],
-  '성북구':     [127.017, 37.606],
-  '송파구':     [127.107, 37.514],
-  '양천구':     [126.867, 37.517],
-  '영등포구':   [126.896, 37.526],
-  '용산구':     [126.990, 37.532],
-  '은평구':     [126.929, 37.603],
-  '종로구':     [126.979, 37.573],
-  '중구':       [126.997, 37.563],
-  '중랑구':     [127.093, 37.606],
+  '전체 서울': [126.978, 37.566],
+  '강남구':    [127.047, 37.517],
+  '강동구':    [127.124, 37.530],
+  '강북구':    [127.011, 37.640],
+  '강서구':    [126.849, 37.551],
+  '관악구':    [126.951, 37.478],
+  '광진구':    [127.082, 37.538],
+  '구로구':    [126.888, 37.495],
+  '금천구':    [126.896, 37.457],
+  '노원구':    [127.057, 37.655],
+  '도봉구':    [127.047, 37.669],
+  '동대문구':  [127.040, 37.574],
+  '동작구':    [126.940, 37.512],
+  '마포구':    [126.909, 37.566],
+  '서대문구':  [126.938, 37.579],
+  '서초구':    [127.032, 37.483],
+  '성동구':    [127.041, 37.563],
+  '성북구':    [127.017, 37.606],
+  '송파구':    [127.107, 37.514],
+  '양천구':    [126.867, 37.517],
+  '영등포구':  [126.896, 37.526],
+  '용산구':    [126.990, 37.532],
+  '은평구':    [126.929, 37.603],
+  '종로구':    [126.979, 37.573],
+  '중구':      [126.997, 37.563],
+  '중랑구':    [127.093, 37.606],
 };
 
 const FACILITY_OPTIONS: { value: FacilityType | 'all'; label: string; img?: string }[] = [
-  { value: 'all',          label: '전체' },
-  { value: 'hospital',     label: '병원',   img: '/markers/hospital.png' },
-  { value: 'clinic',       label: '의원',   img: '/markers/clinic.png' },
-  { value: 'pharmacy',     label: '약국',   img: '/markers/pharmacy.png' },
-  { value: 'health_center',label: '보건소', img: '/markers/health_center.png' },
+  { value: 'all',           label: '전체' },
+  { value: 'hospital',      label: '병원',   img: '/markers/hospital.svg' },
+  { value: 'clinic',        label: '의원',   img: '/markers/clinic.svg' },
+  { value: 'pharmacy',      label: '약국',   img: '/markers/pharmacy.svg' },
+  { value: 'health_center', label: '보건소', img: '/markers/health_center.svg' },
 ];
 
 const MODE_OPTIONS: { value: AnalysisMode; label: string; desc: string }[] = [
@@ -50,17 +49,12 @@ const MODE_OPTIONS: { value: AnalysisMode; label: string; desc: string }[] = [
   { value: 'gap',       label: '의료 공백 분석', desc: '미충족 의료 수요 격자를 히트맵으로 표시합니다' },
 ];
 
-interface AnalysisCardProps {
-  onLaunch: () => void;
-}
-
-function AnalysisCard({ onLaunch }: AnalysisCardProps) {
+function AnalysisCard({ onLaunch }: { onLaunch: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState<FacilityType | 'all'>('all');
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>('profiling');
   const [selectedGu, setSelectedGu] = useState<string>('전체 서울');
   const router = useRouter();
-
   const { setFacilityTypeFilter, setAnalysisMode, setViewState, setSelectedRegionName, viewState } = useStore();
 
   const handleStart = () => {
@@ -75,21 +69,16 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
 
   return (
     <div className={clsx(
-      'relative text-left rounded-2xl border transition-all duration-300',
-      'bg-slate-900/80 border-slate-700/60',
+      'relative rounded-2xl border transition-all duration-300 bg-slate-900/80 border-slate-700/60',
       expanded ? 'border-cyan-500/50 shadow-lg shadow-cyan-500/10' : 'hover:border-cyan-500/40 hover:shadow-md hover:shadow-cyan-500/10 hover:-translate-y-0.5',
     )}>
-      <button
-        className="w-full text-left p-5"
-        onClick={() => setExpanded((v) => !v)}
-      >
-        {/* 아이콘 + 제목 */}
+      <button className="w-full text-left p-5" onClick={() => setExpanded((v) => !v)}>
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-600 flex-shrink-0">
               <div className="grid grid-cols-2 gap-0.5">
-                {['hospital','clinic','pharmacy','health_center'].map((t) => (
-                  <img key={t} src={`/markers/${t}.png`} alt="" className="w-4 h-4 object-contain" />
+                {['hospital', 'clinic', 'pharmacy', 'health_center'].map((t) => (
+                  <img key={t} src={`/markers/${t}.svg`} alt="" className="w-4 h-4 object-contain" />
                 ))}
               </div>
             </div>
@@ -98,23 +87,15 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
               <h3 className="text-base font-bold text-slate-100 mt-0.5">병의원 및 약국 입지분석</h3>
             </div>
           </div>
-          <ChevronDown
-            size={16}
-            className={clsx('text-slate-500 transition-transform duration-200 flex-shrink-0 mt-1', expanded && 'rotate-180 text-cyan-400')}
-          />
+          <ChevronDown size={16} className={clsx('text-slate-500 transition-transform duration-200 flex-shrink-0 mt-1', expanded && 'rotate-180 text-cyan-400')} />
         </div>
         <p className="text-sm text-slate-500 leading-relaxed">
           서울시 의료 공백을 격자 단위로 분석합니다. 시설 유형과 분석 목적을 선택하면 맞춤 지도로 이동합니다.
         </p>
       </button>
 
-      {/* 조건 선택 패널 */}
-      <div className={clsx(
-        'overflow-hidden transition-all duration-300',
-        expanded ? 'max-h-[420px]' : 'max-h-0',
-      )}>
+      <div className={clsx('overflow-hidden transition-all duration-300', expanded ? 'max-h-[420px]' : 'max-h-0')}>
         <div className="px-5 pb-5 space-y-4 border-t border-slate-700/50 pt-4">
-          {/* 시설 유형 */}
           <div>
             <p className="text-xs text-slate-500 font-medium mb-2">시설 유형</p>
             <div className="flex flex-wrap gap-2">
@@ -136,7 +117,6 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
             </div>
           </div>
 
-          {/* 분석 목적 */}
           <div>
             <p className="text-xs text-slate-500 font-medium mb-2">분석 목적</p>
             <div className="space-y-1.5">
@@ -152,10 +132,7 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <span className={clsx(
-                      'w-3 h-3 rounded-full border-2 flex-shrink-0',
-                      selectedMode === value ? 'border-cyan-400 bg-cyan-400' : 'border-slate-600',
-                    )} />
+                    <span className={clsx('w-3 h-3 rounded-full border-2 flex-shrink-0', selectedMode === value ? 'border-cyan-400 bg-cyan-400' : 'border-slate-600')} />
                     <span className="text-xs font-medium">{label}</span>
                   </div>
                   <p className="text-xs text-slate-600 mt-0.5 ml-5">{desc}</p>
@@ -164,7 +141,6 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
             </div>
           </div>
 
-          {/* 자치구 선택 */}
           <div>
             <p className="text-xs text-slate-500 font-medium mb-2">분석 지역</p>
             <select
@@ -178,7 +154,6 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
             </select>
           </div>
 
-          {/* 분석 시작 버튼 */}
           <button
             onClick={handleStart}
             className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-cyan-900/30 flex items-center justify-center gap-2"
@@ -188,11 +163,6 @@ function AnalysisCard({ onLaunch }: AnalysisCardProps) {
           </button>
         </div>
       </div>
-
-      {/* 활성 하이라이트 라인 */}
-      {!expanded && (
-        <div className="absolute bottom-0 left-5 right-5 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-cyan-500 to-blue-600" />
-      )}
     </div>
   );
 }
@@ -208,49 +178,22 @@ export default function ServiceCards({ onLaunchSimCity }: Props) {
         <Sparkles size={14} className="text-cyan-400" />
         <span className="text-sm text-slate-500 font-medium tracking-wider uppercase">Core Services</span>
       </div>
-
       <div className="space-y-4">
-        {/* 첫 번째: 입지분석 (조건 선택 패널 포함) */}
         <AnalysisCard onLaunch={onLaunchSimCity} />
-
-        {/* 나머지 3개: 개발 중 */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            {
-              icon: <Bot size={20} />,
-              title: '자율 분석',
-              subtitle: 'Auto-HIRA',
-              desc: '자연어 명령으로 HIRA 빅데이터 코딩 자동화',
-              gradient: 'from-violet-500 to-purple-600',
-            },
-            {
-              icon: <FileText size={20} />,
-              title: '수가 & 프로토콜',
-              subtitle: 'Cost Protocol',
-              desc: '질환별 최적 진료 경로 및 건강보험 수가 분석',
-              gradient: 'from-emerald-500 to-teal-600',
-            },
-            {
-              icon: <AlertTriangle size={20} />,
-              title: '다약제 탐지',
-              subtitle: 'GNN Drug',
-              desc: 'GNN 기반 약물 상호작용 위험 조기 감지',
-              gradient: 'from-orange-500 to-red-600',
-            },
+            { icon: <Bot size={20} />, title: '자율 분석', subtitle: 'Auto-HIRA', desc: '자연어 명령으로 HIRA 빅데이터 코딩 자동화', gradient: 'from-violet-500 to-purple-600' },
+            { icon: <FileText size={20} />, title: '수가 & 프로토콜', subtitle: 'Cost Protocol', desc: '질환별 최적 진료 경로 및 건강보험 수가 분석', gradient: 'from-emerald-500 to-teal-600' },
+            { icon: <AlertTriangle size={20} />, title: '다약제 탐지', subtitle: 'GNN Drug', desc: 'GNN 기반 약물 상호작용 위험 조기 감지', gradient: 'from-orange-500 to-red-600' },
           ].map((card) => (
-            <div
-              key={card.subtitle}
-              className="relative text-left p-4 rounded-2xl border bg-slate-900/80 border-slate-700/60 opacity-70"
-            >
+            <div key={card.subtitle} className="relative text-left p-4 rounded-2xl border bg-slate-900/80 border-slate-700/60 opacity-70">
               <div className={clsx('w-9 h-9 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br text-white', card.gradient)}>
                 {card.icon}
               </div>
               <p className="text-xs text-slate-600 font-medium">{card.subtitle}</p>
               <h3 className="text-sm font-bold text-slate-300 mt-0.5">{card.title}</h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">{card.desc}</p>
-              <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-600 border border-slate-700/60">
-                개발 중
-              </span>
+              <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-600 border border-slate-700/60">개발 중</span>
             </div>
           ))}
         </div>
