@@ -31,6 +31,7 @@ app = FastAPI(
     description="범용 지역 맞춤형 의료 정책 시뮬레이터 — HIRA 데이터 기반 입지 분석 엔진",
     version="1.0.0",
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 app.add_middleware(
