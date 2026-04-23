@@ -15,6 +15,61 @@ interface Message {
 function getMockReply(text: string): { text: string; json?: string } {
   const t = text.toLowerCase();
 
+  // MediSim City: 정책 시뮬레이션 (심혈관/뇌혈관/골든타임/사망률/증원)
+  if (
+    t.includes('\uC2EC\uD601\uAD00') || t.includes('\uB1CC\uD601\uAD00') ||
+    t.includes('\uACE8\uB4E0\uD0C0\uC784') || t.includes('\uC0AC\uB9DD\uB960') ||
+    t.includes('\uC99D\uC6D0') || t.includes('\uACE0\uC704\uD5D8 \uC0B0\uBAA8') ||
+    (t.includes('\uC2DC\uBBA4\uB808\uC774\uC158') && (t.includes('\uC9C8\uD658') || t.includes('\uC815\uCC45')))
+  ) {
+    const region = t.includes('\uB9C8\uD3EC') ? '\uB9C8\uD3EC\uAD6C' : t.includes('\uAC15\uB0A8') ? '\uAC15\uB0A8\uAD6C' : t.includes('\uB178\uC6D0') ? '\uB178\uC6D0\uAD6C' : '\uC11C\uC6B8';
+    const disease = t.includes('\uC2EC\uD601\uAD00') ? 'CARDIOVASCULAR' : t.includes('\uB1CC\uD601\uAD00') ? 'CEREBROVASCULAR' : t.includes('\uC554') ? 'CANCER' : 'GENERAL';
+    const horizon = t.includes('10\uB144') ? '10_YEARS' : t.includes('3\uB144') ? '3_YEARS' : t.includes('1\uB144') ? '1_YEAR' : '5_YEARS';
+    return {
+      text: 'MediSim City \uC815\uCC45 \uC2DC\uBBA4\uB808\uC774\uC158 \uC5D4\uC9C4\uC744 \uAC00\uB3D9\uD569\uB2C8\uB2E4.\n\n[\uB370\uC774\uD130 \uCD94\uCD9C \uC5D0\uC774\uC804\uD2B8] \u2192 HIRA \uC9C4\uB8CC\uD589\uC704 \uBC0F KOSIS \uC7A5\uB798\uC778\uAD6C\uCD94\uACC4 \uB85C\uB529\n[\uC2E0\uACBD\uB9DD \uC5F0\uC0B0 \uC5D0\uC774\uC804\uD2B8] \u2192 NAS \uAE30\uBC18 \uC608\uCE21 \uBAA8\uB378 \uC2E4\uD589\n[\uBCF4\uACE0\uC11C \uC0DD\uC131 \uC5D0\uC774\uC804\uD2B8] \u2192 \uC784\uC0C1 \uC608\uD6C4 \uBC0F \uAC74\uBCF4\uC7AC\uC815 \uC784\uD329\uD2B8 \uC0B0\uCD9C',
+      json: JSON.stringify({
+        service: 'POLICY_SIMCITY',
+        action: 'RUN_SIMULATION',
+        params: {
+          region,
+          disease_type: disease,
+          policy_change: t.includes('\uC751\uAE09\uC13C\uD130') ? 'ADD_EMERGENCY_CENTER' : t.includes('\uBCD1\uC6D0 \uC2E0\uC124') ? 'BUILD_HOSPITAL' : 'ADD_SPECIALIST',
+          time_horizon: horizon,
+          expected_outcomes: ['\uACE8\uB4E0\uD0C0\uC784 \uAC10\uC18C', '\uC0AC\uB9DD\uB960 \uAC10\uC18C', '\uAC74\uBCF4\uC7AC\uC815 \uC808\uAC10'],
+        },
+      }, null, 2),
+    };
+  }
+
+  // EssentialMap: EMDI / 필수의료 공백 추적
+  if (
+    t.includes('emdi') || t.includes('\uD544\uC218\uC758\uB8CC') ||
+    t.includes('\uD3D0\uC5C5') || t.includes('\uC18C\uC544\uCCAD\uC18C\uB144\uACFC') ||
+    t.includes('\uC0B0\uBD80\uC778\uACFC') || t.includes('\uC751\uAE09\uC758\uD559\uACFC') ||
+    (t.includes('\uC678\uACFC') && t.includes('\uACF5\uBC31'))
+  ) {
+    const specialty = t.includes('\uC18C\uC544\uCCAD\uC18C\uB144\uACFC') ? '\uC18C\uC544\uCCAD\uC18C\uB144\uACFC'
+      : t.includes('\uC0B0\uBD80\uC778\uACFC') ? '\uC0B0\uBD80\uC778\uACFC'
+      : t.includes('\uC751\uAE09\uC758\uD559\uACFC') ? '\uC751\uAE09\uC758\uD559\uACFC'
+      : t.includes('\uC678\uACFC') ? '\uC678\uACFC'
+      : '4\uB300 \uD544\uC218\uC758\uB8CC';
+    return {
+      text: 'EssentialMap \uD544\uC218\uC758\uB8CC \uACF5\uBC31 \uCD94\uC801 \uC2DC\uC2A4\uD15C\uC744 \uAC00\uB3D9\uD569\uB2C8\uB2E4.\n\nHIRA \uAC1C\uD3D0\uC5C5\uC815\uBCF4 REST API \uD06C\uB85C\uC2A4\uB9E4\uCE6D \uC911...\nEMDI \uC704\uAE30 \uC9C0\uC218 \uC0B0\uCD9C \uC911 (5\uB2E8\uACC4 \uB4F1\uAE09\uD654)...\n\uC815\uCC45 \uAC1C\uC785 \uC131\uD5A5 \uB9E4\uCE6D \uC911...',
+      json: JSON.stringify({
+        service: 'ESSENTIAL_MAP',
+        action: 'TRACK_GAP',
+        params: {
+          specialty,
+          analysis_types: ['EMDI_INDEX', 'CLOSURE_TREND', 'POLICY_MATCH'],
+          data_sources: ['HIRA_CLOSURE_API', 'HIRA_HOSPITAL_API', 'KOSIS_POPULATION'],
+          alert_threshold: 'GRADE_3',
+          report_schedule: 'WEEKLY_FRIDAY',
+        },
+      }, null, 2),
+    };
+  }
+
+  // 소아과/야간 시나리오 (기존)
   if (t.includes('\uC18C\uC544\uACFC') || t.includes('\uC57C\uAC04') || t.includes('\uCD94\uAC00') || t.includes('\uC2DC\uBBA4\uB808')) {
     return {
       text: '\uD655\uC778\uD558\uACA0\uC2B5\uB2C8\uB2E4. \uC815\uCC45 \uC2DC\uBBA4\uB808\uC774\uC158 \uC2DC\uC791 \uC804 \uD30C\uB77C\uBBF8\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4.\n\uD574\uB2F9 \uC9C0\uC5ED\uC758 \uC778\uAD6C \uBD84\uD3EC, \uD604\uC7AC \uC758\uB8CC \uC778\uD504\uB77C, \uC751\uAE09 \uC218\uC694\uB97C \uB85C\uB4DC\uD558\uACE0 \uC2DC\uBBA4\uB808\uC774\uC158\uC744 \uC218\uD589\uD569\uB2C8\uB2E4.',
