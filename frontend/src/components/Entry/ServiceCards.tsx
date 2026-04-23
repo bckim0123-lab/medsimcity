@@ -89,7 +89,7 @@ const INTERVENTION_OPTIONS: { value: string; label: string; desc: string }[] = [
   {
     value: 'emergency',
     label: '\uC751\uAE09\uC13C\uD130 \uCD94\uAC00',
-    desc: '\uC751\uAE09\uC758\uB8CC\uC13C\uD130 \uC2E0\uC124 \uC2DC \uB300\uC751 \uC5ED\uB7C9 \uC2DC\uBBA4\uB808\uC774\uC158',
+    desc: '\uC751\uAE09\uC758\uB8CC\uC13C\uD130 \uC2E0\uC124 \uC2DC \uB300\uC751 \uC5ED\uB7C9 \uC2DC\uBBEC\uB808\uC774\uC158',
   },
   {
     value: 'hospital',
@@ -467,7 +467,7 @@ function PolicySimulatorCard({ onSendToAgent }: { onSendToAgent: (q: string) => 
 
   const handleStart = () => {
     const intervention = INTERVENTION_OPTIONS.find((o) => o.value === selectedIntervention);
-    const query = `${selectedGu} ${selectedDisease} \uC9C8\uD658\uC5D0 \uB300\uD574 ${intervention?.label ?? ''} \uC815\uCC45\uC744 \uC2DC\uD589\uD560 \uACBD\uC6B0 ${selectedHorizon} \uB4A4\uC758 \uACE8\uB4E0\uD0C0\uC784, \uC0AC\uB9DD\uB960, \uAC74\uBCF4\uC7AC\uC815 \uBCC0\uD654\uB97C \uC2DC\uBBA4\uB808\uC774\uC158\uD574\uC918.`;
+    const query = `${selectedGu} ${selectedDisease} \uC9C8\uD658\uC5D0 \uB300\uD574 ${intervention?.label ?? ''} \uC815\uCC45\uC744 \uC2DC\uD589\uD560 \uACBD\uC6B0 ${selectedHorizon} \uB4A4\uC758 \uACE8\uB4E0\uD0C0\uC784, \uC0AC\uB9DD\uB960, \uAC74\uBCF4\uC7AC\uC815 \uBCC0\uD654\uB97C \uC2DC\uBBEC\uB808\uC774\uC158\uD574\uC918.`;
     onSendToAgent(query);
     setExpanded(false);
   };
@@ -487,7 +487,7 @@ function PolicySimulatorCard({ onSendToAgent }: { onSendToAgent: (q: string) => 
           <ChevronDown size={15} className={clsx('text-slate-500 transition-transform duration-200 mt-1', expanded && 'rotate-180 text-orange-400')} />
         </div>
         <p className="text-[10px] text-slate-500 font-medium tracking-wide mb-0.5">MediSim City</p>
-        <h3 className="text-sm font-bold text-slate-100 leading-snug">{'\uC815\uCC45 \uC2DC\uBBA4\uB808\uC774\uD130'}</h3>
+        <h3 className="text-sm font-bold text-slate-100 leading-snug">{'\uC815\uCC45 \uC2DC\uBBEC\uB808\uC774\uD130'}</h3>
         <p className="text-xs text-slate-500 mt-2 leading-relaxed">
           {'\uC758\uB8CC \uC790\uC6D0 \uBC30\uCE58 \uC2DC\uB098\uB9AC\uC624\uC758 \uC784\uC0C1\u00B7\uC7AC\uC815 \uC601\uD5A5 \uC608\uCE21'}
         </p>
@@ -581,7 +581,7 @@ function PolicySimulatorCard({ onSendToAgent }: { onSendToAgent: (q: string) => 
             className="w-full py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-orange-900/30 flex items-center justify-center gap-2"
           >
             <Zap size={14} />
-            {'\uC2DC\uBBA4\uB808\uC774\uC158 \uC2DC\uC791'}
+            {'\uC2DC\uBBEC\uB808\uC774\uC158 \uC2DC\uC791'}
           </button>
 
           <div className="flex flex-wrap gap-1">

@@ -89,7 +89,7 @@ export default function CommandCenter() {
             </span>
           </h1>
           <p className="mt-3 text-sm text-slate-400 leading-relaxed">
-            {'\uC2E4\uC2DC\uAC04 \uC758\uB8CC \uC778\uD504\uB77C \uACF5\uBC31 \uBD84\uC11D \u00B7 \uC815\uCC45 \uD6A8\uACFC \uC2DC\uBBA4\uB808\uC774\uC158 \u00B7 \uC218\uAC00 \uCD5C\uC801 \uACBD\uB85C \uD0D0\uC0C9'}
+            {'\uC2E4\uC2DC\uAC04 \uC758\uB8CC \uC778\uD504\uB77C \uACF5\uBC31 \uBD84\uC11D \u00B7 \uC815\uCC45 \uD6A8\uACFC \uC2DC\uBBEC\uB808\uC774\uC158 \u00B7 \uC218\uAC00 \uCD5C\uC801 \uACBD\uB85C \uD0D0\uC0C9'}
           </p>
         </div>
 
