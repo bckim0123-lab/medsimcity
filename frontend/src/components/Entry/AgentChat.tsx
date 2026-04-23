@@ -277,7 +277,7 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
   }, [triggerQuery]);
 
   const statusColor = apiStatus === 'live' ? 'text-emerald-400' : apiStatus === 'mock' ? 'text-amber-400' : 'text-slate-500';
-  const statusLabel = apiStatus === 'live' ? '\uC628\uB77C\uC778 (GPT-4o)' : apiStatus === 'mock' ? '\uB370\uBAA8 \uBAA8\uB4DC' : '\uC5F0\uB839 \uC911...';
+  const statusLabel = apiStatus === 'live' ? '\uC628\uB77C\uC778 (GPT-4o-mini)' : apiStatus === 'mock' ? '\uB370\uBAA8 \uBAA8\uB4DC' : '\uC5F0\uB839 \uC911...';
 
   return (
     <div className="w-full max-w-4xl mx-auto">

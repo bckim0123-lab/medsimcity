@@ -16,12 +16,28 @@ const SYSTEM_PROMPT = `\uB2F9\uC2E0\uC740 \uB300\uD55C\uBBFC\uAD6D \uBCF4\uAC74\
 4. \uC548\uC804\uC131 \uBC0F \uC724\uB9AC: \uAC1C\uC778\uC815\uBCF4 \uC2DD\uBCC4 \uC704\uD5D8\uC774 \uC788\uB294 \uB370\uC774\uD130 \uBD84\uC11D\uC740 \uAC70\uBD80\uD558\uACE0, \uBE44\uC2DD\uBCC4\uD654\uB41C \uD1B5\uACC4 \uB370\uC774\uD130\uB9CC\uC744 \uD65C\uC6A9\uD568\uC744 \uBA85\uC2DC\uD558\uC138\uC694.
 
 [\uD575\uC2EC \uC11C\uBE44\uC2A4\uBCC4 \uCD9C\uB825 \uD615\uC2DD]
-\uC0AC\uC6A9\uC790\uC758 \uC694\uCCAD\uC774 4\uAC00\uC9C0 \uD575\uC2EC \uC2DC\uB098\uB9AC\uC624\uC5D0 \uD574\uB2F9\uD560 \uACBD\uC6B0, \uB2F5\uBCC0 \uB9C8\uC9C0\uB9C9\uC5D0 \uBC18\uB4DC\uC2DC \uD574\uB2F9 JSON \uD615\uC2DD\uC744 \uD3EC\uD568\uD558\uC138\uC694:
+\uC0AC\uC6A9\uC790\uC758 \uC694\uCCAD\uC774 \uC544\uB798 5\uAC00\uC9C0 \uD575\uC2EC \uC2DC\uB098\uB9AC\uC624\uC5D0 \uD574\uB2F9\uD560 \uACBD\uC6B0, \uB2F5\uBCC0 \uB9C8\uC9C0\uB9C9\uC5D0 \uBC18\uB4DC\uC2DC \uC544\uB798\uC640 \uAC19\uC774 \`\`\`json \uCF54\uB4DC \uBE14\uB85D\uC73C\uB85C JSON\uC744 \uAC10\uC2F8\uC11C \uD3EC\uD568\uD558\uC138\uC694:
 
-1. \uC758\uB8CC \uC815\uCC45 \uC2EC\uC2DC\uD2F0 (SimCity): {"service":"POLICY_SIMCITY","action":"RUN_SIMULATION","params":{"region":"\uD574\uB2F9\uAD6C","policy_change":"\uC815\uCC45\uBA85","value":n,"time_horizon":"5_YEARS"}}
-2. \uC790\uC728 HIRA \uBD84\uC11D: {"service":"AUTO_HIRA","action":"CODE_GENERATION","params":{"query":"\uC790\uC5F0\uC5B4 \uC9C8\uC758","dataset":"HIRA_API"}}
-3. \uC758\uB8CC AI \uBAA8\uB378 \uC124\uACC4: {"service":"NEURAL_NET","action":"DESIGN_ARCH","params":{"task":"\uC9C8\uBCD1\uBA85","model_type":"GNN|DNN|Transformer"}}
-4. DUR \uBD84\uC11D: {"service":"DUR_ANALYSIS","action":"SCAN_INTERACTIONS","params":{"drug_list":[],"patient_profile":"\uC635\uC158"}}`;
+1. \uC758\uB8CC \uC815\uCC45 \uC2EC\uC2DC\uD2F0 (SimCity) \u2014 \uC9C0\uC5ED/\uC9C8\uD658/\uC815\uCC45 \uC2DC\uBBEC\uB808\uC774\uC158
+\`\`\`json
+{"service":"POLICY_SIMCITY","action":"RUN_SIMULATION","params":{"region":"\uD574\uB2F9\uAD6C","disease_type":"CARDIOVASCULAR|CEREBROVASCULAR|CANCER|MATERNAL","policy_change":"\uC815\uCC45\uBA85","time_horizon":"5_YEARS"}}
+\`\`\`
+2. \uC790\uC728 HIRA \uBD84\uC11D \u2014 \uCF54\uB4DC \uC790\uB3D9 \uC0DD\uC131
+\`\`\`json
+{"service":"AUTO_HIRA","action":"CODE_GENERATION","params":{"query":"\uC790\uC5F0\uC5B4 \uC9C8\uC758","dataset":"HIRA_API"}}
+\`\`\`
+3. \uC758\uB8CC AI \uBAA8\uB378 \uC124\uACC4
+\`\`\`json
+{"service":"NEURAL_NET","action":"DESIGN_ARCH","params":{"task":"\uC9C8\uBCD1\uBA85","model_type":"GNN|DNN|Transformer"}}
+\`\`\`
+4. DUR \uBD84\uC11D \u2014 \uC57D\uBB3C \uC0C1\uD638\uC791\uC6A9
+\`\`\`json
+{"service":"DUR_ANALYSIS","action":"SCAN_INTERACTIONS","params":{"drug_list":[],"patient_profile":"\uC635\uC158"}}
+\`\`\`
+5. \uD544\uC218\uC758\uB8CC \uACF5\uBC31 \uCD94\uC801 (EssentialMap) \u2014 EMDI \uC704\uAE30\uC9C0\uC218
+\`\`\`json
+{"service":"ESSENTIAL_MAP","action":"TRACK_GAP","params":{"specialty":"\uC18C\uC544\uCCAD\uC18C\uB144\uACFC|\uC0B0\uBD80\uC778\uACFC|\uC751\uAE09\uC758\uD559\uACFC|\uC678\uACFC","analysis_type":"EMDI_INDEX|CLOSURE_TREND|POLICY_MATCH","region":"\uD574\uB2F9\uAD6C"}}
+\`\`\``;
 
 interface HistoryItem {
   role: 'agent' | 'user';
@@ -57,7 +73,7 @@ export async function POST(request: NextRequest) {
       model: 'gpt-4o-mini',
       messages,
       stream: true,
-      max_tokens: 900,
+      max_tokens: 1500,
       temperature: 0.7,
     });
 
