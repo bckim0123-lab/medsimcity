@@ -124,7 +124,7 @@ export default function MapCanvas() {
     [setTooltip],
   );
 
-  // ?? ?? ??
+  // Map load: apply white text + strong halo to all symbol layers for readability
   const handleMapLoad = useCallback((evt: { target: { getStyle: () => { layers: Array<{ id: string; type: string }> }; setPaintProperty: (id: string, prop: string, val: unknown) => void } }) => {
     const map = evt.target;
     try {
@@ -137,7 +137,7 @@ export default function MapCanvas() {
           map.setPaintProperty(l.id, 'text-halo-blur', 0.5);
         });
     } catch {
-      // ??? ?? ? ?? ? ??
+      // Silently ignore style errors (style may not be fully loaded yet)
     }
   }, []);
 
@@ -148,7 +148,7 @@ export default function MapCanvas() {
   const layers = useMemo(() => {
     const result = [];
 
-    // 1. ?? ?? ??? (?? 600m)
+    // 1. Population hexagon layer (600m radius grid)
     if (showPopulation && populationCells.length > 0) {
       result.push(
         new HexagonLayer<PopulationCell>({
@@ -176,7 +176,7 @@ export default function MapCanvas() {
       );
     }
 
-    // 2. ?? ?? GeoJSON ? ???? ????? ??? ?? ON ?? ?? ???
+    // 2. Gap analysis GeoJSON ? only render when gapEnabled AND showGap is explicitly ON
     if (gapEnabled && showGap && gapGeoJSON) {
       result.push(
         new GeoJsonLayer({
@@ -195,7 +195,7 @@ export default function MapCanvas() {
       );
     }
 
-    // 3. ?? ?? IconLayer (SVG ?????? ???)
+    // 3. Facility IconLayer (SVG marker atlas per type)
     if (showFacilities && facilities.length > 0 && iconsReady) {
       FACILITY_TYPES.forEach((type) => {
         const dataUrl = markerIcons[type];
@@ -242,7 +242,7 @@ export default function MapCanvas() {
         <Map mapStyle={MAP_STYLE} onLoad={handleMapLoad as never} />
       </DeckGL>
 
-      {/* ?? */}
+      {/* Tooltip overlay */}
       {tooltip?.object && (
         <div
           className="map-tooltip absolute z-50 max-w-xs"

@@ -365,7 +365,7 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
           <div className="mx-4 mb-2 flex items-center gap-2 bg-amber-950/40 border border-amber-800/40 rounded-xl px-3 py-2">
             <AlertCircle size={12} className="text-amber-400 flex-shrink-0" />
             <p className="text-[11px] text-amber-300">
-              {'\uB370\uBAA8 \uBAA8\uB4DC \uC911 \u2014 OPENAI_API_KEY\uB97C Vercel \uD658\uACBD\uBCC0\uC218\uC5D0 \uCD94\uAC00\uD558\uBA74 \uC2E4\uC81C GPT-4o\uB85C \uC2E4\uD589\uB429\uB2C8\uB2E4.'}
+              {'\uB370\uBAA8 \uBAA8\uB4DC \uC911 \u2014 OPENAI_API_KEY\uB97C Vercel \uD658\uACBD\uBCC0\uC218\uC5D0 \uCD94\uAC00\uD558\uBA74 \uC2E4\uC81C GPT-4o-mini\uB85C \uC2E4\uD589\uB429\uB2C8\uB2E4.'}
             </p>
           </div>
         )}
