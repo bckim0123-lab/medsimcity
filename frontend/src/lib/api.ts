@@ -8,10 +8,23 @@ import type {
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://medsimcity.onrender.com';
 
-async function get<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
+const FETCH_TIMEOUT_MS = 12_000;
+
+async function get<T>(
+  path: string,
+  params: Record<string, string | number> = {},
+  signal?: AbortSignal,
+): Promise<T> {
   const url = new URL(BASE + path);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  const res = await fetch(url.toString(), { cache: 'no-store' });
+
+  // Combine caller-provided signal with a per-request deadline
+  const deadline = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+  const combined = signal
+    ? AbortSignal.any([signal, deadline])
+    : deadline;
+
+  const res = await fetch(url.toString(), { cache: 'no-store', signal: combined });
   if (!res.ok) throw new Error(`API Error ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
@@ -20,6 +33,7 @@ async function get<T>(path: string, params: Record<string, string | number> = {}
 export function fetchFacilities(
   bounds: MapBounds,
   types: string = 'all',
+  signal?: AbortSignal,
 ): Promise<Facility[]> {
   return get<Facility[]>('/api/facilities/', {
     min_lat: bounds.min_lat,
@@ -27,21 +41,21 @@ export function fetchFacilities(
     min_lon: bounds.min_lon,
     max_lon: bounds.max_lon,
     types,
-  });
+  }, signal);
 }
 
-export function fetchStats() {
-  return get<{ total: number; by_type: Record<string, number> }>('/api/facilities/stats');
+export function fetchStats(signal?: AbortSignal) {
+  return get<{ total: number; by_type: Record<string, number> }>('/api/facilities/stats', {}, signal);
 }
 
 // ── 인구 격자 ─────────────────────────────────────────────────────────────────
-export function fetchPopulation(bounds: MapBounds): Promise<PopulationCell[]> {
+export function fetchPopulation(bounds: MapBounds, signal?: AbortSignal): Promise<PopulationCell[]> {
   return get<PopulationCell[]>('/api/analysis/population', {
     min_lat: bounds.min_lat,
     max_lat: bounds.max_lat,
     min_lon: bounds.min_lon,
     max_lon: bounds.max_lon,
-  });
+  }, signal);
 }
 
 // ── 공백 분석 ─────────────────────────────────────────────────────────────────
@@ -49,6 +63,7 @@ export function fetchGapAnalysis(
   bounds: MapBounds,
   disease_type: DiseaseType = 'all',
   facility_type: string = 'all',
+  signal?: AbortSignal,
 ): Promise<GapGeoJSON> {
   return get<GapGeoJSON>('/api/analysis/gap', {
     min_lat: bounds.min_lat,
@@ -57,7 +72,7 @@ export function fetchGapAnalysis(
     max_lon: bounds.max_lon,
     disease_type,
     facility_type,
-  });
+  }, signal);
 }
 
 // ── Nominatim 지오코딩 (무료 OSM) ─────────────────────────────────────────────

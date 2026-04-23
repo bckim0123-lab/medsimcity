@@ -176,7 +176,7 @@ export default function MapCanvas() {
       );
     }
 
-    // 2. Gap analysis GeoJSON ? only render when gapEnabled AND showGap is explicitly ON
+    // 2. Gap analysis GeoJSON - only render when gapEnabled AND showGap is explicitly ON
     if (gapEnabled && showGap && gapGeoJSON) {
       result.push(
         new GeoJsonLayer({

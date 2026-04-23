@@ -151,15 +151,18 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
   const [busy, setBusy] = useState(false);
   const [apiStatus, setApiStatus] = useState<ApiStatus>('unknown');
   const bottomRef = useRef<HTMLDivElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const abortRef  = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, busy]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount — abort any in-flight fetch and mark component as dead
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       abortRef.current?.abort();
     };
   }, []);
@@ -189,9 +192,10 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
       });
 
       if (res.status === 503) {
-        // No API key — fall back to mock (return early to skip finally's setBusy duplicate)
+        // No API key — fall back to mock with a short simulated delay
         setApiStatus('mock');
         await new Promise((r) => setTimeout(r, 800 + Math.random() * 300));
+        if (!mountedRef.current) return;
         const reply = getMockReply(t);
         setMessages((prev) => [...prev, { role: 'agent', ...reply }]);
         return; // finally will call setBusy(false)
@@ -200,9 +204,6 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       setApiStatus('live');
-
-      // Stream the response
-      const agentIdx = messages.length + 1; // after the user message we just added
       setMessages((prev) => [...prev, { role: 'agent', text: '', streaming: true }]);
 
       const reader = res.body?.getReader();
@@ -250,7 +251,6 @@ export default function AgentChat({ triggerQuery }: AgentChatProps = {}) {
         return next;
       });
 
-      void agentIdx; // suppress lint warning
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'AbortError') return;
       setApiStatus('mock');

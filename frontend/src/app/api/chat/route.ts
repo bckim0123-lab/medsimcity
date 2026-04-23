@@ -100,14 +100,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error('[chat/route] error:', error);
-    const isRateLimit =
-      error instanceof Error && error.message?.includes('429');
+    const isRateLimit = error instanceof OpenAI.RateLimitError;
+    const isAuthError = error instanceof OpenAI.AuthenticationError;
     return NextResponse.json(
       {
-        error: isRateLimit ? 'Rate limit exceeded' : 'LLM call failed',
+        error: isRateLimit ? 'Rate limit exceeded' : isAuthError ? 'Invalid API key' : 'LLM call failed',
         detail: error instanceof Error ? error.message : String(error),
       },
-      { status: isRateLimit ? 429 : 500 }
+      { status: isRateLimit ? 429 : isAuthError ? 401 : 500 }
     );
   }
 }

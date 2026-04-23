@@ -24,8 +24,9 @@ export function useMapData() {
     setErrorMessage,
   } = useStore();
 
-  const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reqIdRef    = useRef(0); // increments on every fetch; used to discard stale responses
+  const timerRef      = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reqIdRef      = useRef(0);
+  const abortRef      = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!bounds) return;
@@ -34,6 +35,12 @@ export function useMapData() {
 
     timerRef.current = setTimeout(async () => {
       const reqId = ++reqIdRef.current;
+
+      // Cancel any in-flight requests from the previous cycle
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const { signal } = controller;
 
       // Read zoom from live store state — avoids viewState in deps (prevents double-trigger on pan)
       const zoom = useStore.getState().viewState.zoom ?? 12;
@@ -52,11 +59,11 @@ export function useMapData() {
       if (needFac) setLoadingFacilities(true);
       if (needGap) setLoadingGap(true);
 
-      // Fire all three requests in parallel
+      // Fire all three requests in parallel — pass signal for cancellation
       const [facRes, popRes, gapRes] = await Promise.allSettled([
-        needFac ? fetchFacilities(bounds, facilityTypeFilter) : Promise.resolve(null),
-        needPop ? fetchPopulation(bounds)                    : Promise.resolve(null),
-        needGap ? fetchGapAnalysis(bounds, diseaseType, facilityTypeFilter) : Promise.resolve(null),
+        needFac ? fetchFacilities(bounds, facilityTypeFilter, signal) : Promise.resolve(null),
+        needPop ? fetchPopulation(bounds, signal)                     : Promise.resolve(null),
+        needGap ? fetchGapAnalysis(bounds, diseaseType, facilityTypeFilter, signal) : Promise.resolve(null),
       ]);
 
       // Discard stale responses (a newer request already fired)
@@ -94,9 +101,12 @@ export function useMapData() {
         if (gapRes.status === 'fulfilled' && gapRes.value !== null) {
           setGapGeoJSON(gapRes.value);
         } else if (gapRes.status === 'rejected') {
-          setErrorMessage(
-            '\uACF5\uBC31 \uBD84\uC11D\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uBDF0\uD3EC\uD2B8\uB97C \uC88C\uC0C8 \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694.',
-          );
+          // Ignore AbortError — caused by user navigating away or a newer request
+          if (gapRes.reason?.name !== 'AbortError') {
+            setErrorMessage(
+              '\uACF5\uBC31 \uBD84\uC11D\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uBDF0\uD3EC\uD2B8\uB97C \uC88C\uC0C8 \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694.',
+            );
+          }
           setGapGeoJSON(null);
         }
       }
@@ -104,6 +114,7 @@ export function useMapData() {
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
+      abortRef.current?.abort();
     };
   }, [
     bounds,

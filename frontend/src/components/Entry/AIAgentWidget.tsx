@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -27,16 +27,25 @@ export default function AIAgentWidget() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup pending mock-reply timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const send = () => {
     const text = input.trim();
-    if (!text) return;
+    if (!text || typing) return;
 
     setMessages((prev) => [...prev, { role: 'user', text }]);
     setInput('');
     setTyping(true);
 
-    setTimeout(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       const key = Object.keys(MOCK_REPLIES).find((k) => text.includes(k));
       const reply = key
         ? MOCK_REPLIES[key]

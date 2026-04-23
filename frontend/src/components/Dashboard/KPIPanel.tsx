@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { BarChart3, Activity, Loader2, ZoomIn } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { MIN_GAP_ZOOM } from '@/hooks/useMapData';
@@ -34,21 +35,21 @@ export default function KPIPanel() {
   const currentZoom = viewState.zoom ?? 12;
   const gapZoomOk   = currentZoom >= MIN_GAP_ZOOM;
 
-  const gapStats = (() => {
+  const gapStats = useMemo(() => {
     if (!gapGeoJSON?.features?.length) return null;
     const scores = gapGeoJSON.features.map((f) => f.properties?.need_score ?? 0);
     const critical = scores.filter((s) => s >= 80).length;
     const high     = scores.filter((s) => s >= 60 && s < 80).length;
     const avg      = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
     return { critical, high, avg: avg.toFixed(1), total: scores.length };
-  })();
+  }, [gapGeoJSON]);
 
-  const facilityStats = (() => {
+  const facilityStats = useMemo(() => {
     if (!facilities.length) return null;
     const counts: Record<string, number> = {};
     facilities.forEach((f) => { counts[f.type] = (counts[f.type] ?? 0) + 1; });
     return counts;
-  })();
+  }, [facilities]);
 
   return (
     <aside className="flex flex-col h-full bg-slate-900 border-l border-slate-700/50 w-72 flex-shrink-0 overflow-y-auto">
