@@ -50,6 +50,7 @@ interface MediSimState {
 
   showGap: boolean;
   toggleGap: () => void;
+  setShowGap: (v: boolean) => void;
 
   showFacilities: boolean;
   toggleFacilities: () => void;
@@ -115,6 +116,7 @@ export const useStore = create<MediSimState>((set) => ({
 
   showGap:    false,
   toggleGap:  () => set((s) => ({ showGap: !s.showGap })),
+  setShowGap: (v) => set({ showGap: v }),
 
   showFacilities:   true,
   toggleFacilities: () => set((s) => ({ showFacilities: !s.showFacilities })),
